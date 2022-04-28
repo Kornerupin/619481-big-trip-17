@@ -21,7 +21,7 @@ export default class ListPresenter {
 
     for (let i = 0; i < 3; i++) {
       const item = new TripEventsItemView();
-      this.itemsList.push(item);
+      this.itemsList.push(item.getElement());
 
       render(item, this.listComponent.getElement());
     }
