@@ -144,7 +144,7 @@ export default class TripEventsItemEditView {
   }
 
   getTemplate() {
-    return createTemplate(this.point)
+    return createTemplate(this.point);
   }
 
   getElement() {
