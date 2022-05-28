@@ -1,4 +1,5 @@
 import {getRandomFromArray, getAllArrayId, getFormatDayJs} from '../utils';
+import {POINT_TYPES, POINT_PRICES} from '../const';
 import daysjs from 'dayjs';
 
 const cities = [
@@ -44,54 +45,53 @@ const getDestination = () => {
   return cities[2];
 };
 
-const offerTypes = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 const offerOffers = [
   {
-    'typesId': getAllArrayId(offerTypes, ['taxi']),
+    'typesId': getAllArrayId(POINT_TYPES, ['taxi']),
     'title': 'Upgrade to a business class',
     'price': 120
   }, {
-    'typesId': getAllArrayId(offerTypes, ['drive']),
+    'typesId': getAllArrayId(POINT_TYPES, ['drive']),
     'title': 'Order Uber',
     'price': 20
   }, {
-    'typesId': getAllArrayId(offerTypes, ['drive']),
+    'typesId': getAllArrayId(POINT_TYPES, ['drive']),
     'title': 'Rent a car',
     'price': 200
   }, {
-    'typesId': getAllArrayId(offerTypes, ['taxi']),
+    'typesId': getAllArrayId(POINT_TYPES, ['taxi']),
     'title': 'Choose the radio station',
     'price': 60
   }, {
-    'typesId': getAllArrayId(offerTypes, ['flight']),
+    'typesId': getAllArrayId(POINT_TYPES, ['flight']),
     'title': 'Add luggage',
     'price': 30
   }, {
-    'typesId': getAllArrayId(offerTypes, ['taxi', 'flight']),
+    'typesId': getAllArrayId(POINT_TYPES, ['taxi', 'flight']),
     'title': 'Switch to comfort class',
     'price': 100
   }, {
-    'typesId': getAllArrayId(offerTypes, ['flight']),
+    'typesId': getAllArrayId(POINT_TYPES, ['flight']),
     'title': 'Add meal',
     'price': 15
   }, {
-    'typesId': getAllArrayId(offerTypes, ['flight']),
+    'typesId': getAllArrayId(POINT_TYPES, ['flight']),
     'title': 'Chose seats',
     'price': 5
   }, {
-    'typesId': getAllArrayId(offerTypes, ['flight']),
+    'typesId': getAllArrayId(POINT_TYPES, ['flight']),
     'title': 'Travel by train',
     'price': 40
   }, {
-    'typesId': getAllArrayId(offerTypes, ['check-in']),
+    'typesId': getAllArrayId(POINT_TYPES, ['check-in']),
     'title': 'Add breakfast',
     'price': 50
   }, {
-    'typesId': getAllArrayId(offerTypes, ['sightseeing']),
+    'typesId': getAllArrayId(POINT_TYPES, ['sightseeing']),
     'title': 'Book tickets',
     'price': 40
   }, {
-    'typesId': getAllArrayId(offerTypes, ['sightseeing']),
+    'typesId': getAllArrayId(POINT_TYPES, ['sightseeing']),
     'title': 'Lunch in city',
     'price': 30
   },
@@ -118,22 +118,20 @@ const randomDateDelay = (from) => {
 const getOffer = (type) => ({
   'type': type,
   'data': offerOffers
-    .map((current) => current.typesId.indexOf(offerTypes.indexOf(type)) !== -1 ? current : -1)
+    .map((current) => current.typesId.indexOf(POINT_TYPES.indexOf(type)) !== -1 ? current : -1)
     .filter((current) => current !== -1),
 });
 
-const pointTypes = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
-const pointPrices = [100, 20, 50, 200, 100, 500, 50, 80, 100];
 
 const getPoint = () => {
-  const type = getRandomFromArray(pointTypes);
+  const type = getRandomFromArray(POINT_TYPES);
   const destination = getDestination();
-  const typeId = pointTypes.indexOf(type);
+  const typeId = POINT_TYPES.indexOf(type);
 
   const dateTo = randomDateDelay(dateFrom);
 
   const result = {
-    'basePrice': pointPrices[typeId],
+    'basePrice': POINT_PRICES[typeId],
     'dateFrom': getFormatDayJs(dateFrom),
     'dateTo': getFormatDayJs(dateTo),
     'destination': destination,
