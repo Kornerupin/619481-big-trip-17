@@ -3,6 +3,7 @@ import TripSortView from '../view/trip-sort-view';
 import TripEventsListView from '../view/trip-events-list-view';
 import TripEventsItemView from '../view/trip-events-item-view';
 import TripEventsItemEditView from '../view/trip-events-item-edit-view';
+import TripEventsListEmpty from '../view/trip-events-list-empty';
 
 
 export default class ListPresenter {
@@ -15,17 +16,27 @@ export default class ListPresenter {
   #itemsList = [];
   #listItems = [];
 
-  init = (tripContainer, pointsModel) => {
+  constructor(tripContainer, pointsModel) {
     this.#tripContainer = tripContainer;
     this.#pointsModel = pointsModel;
+  }
 
+  init = () => {
     this.#listItems = [...this.#pointsModel.points];
 
-    render(this.#sortComponent, this.#tripContainer);
-    render(this.#listComponent, this.#tripContainer);
+    this.#renderApp();
+  };
 
-    for (let i = 0; i < this.#listItems.length; i++) {
-      this.#renderItem(this.#listItems[i]);
+  #renderApp = () => {
+    if (this.#listItems.length === 0) {
+      render(new TripEventsListEmpty(), this.#tripContainer);
+    }
+    else {
+      render(this.#sortComponent, this.#tripContainer);
+      render(this.#listComponent, this.#tripContainer);
+      for (let i = 0; i < this.#listItems.length; i++) {
+        this.#renderItem(this.#listItems[i]);
+      }
     }
   };
 
