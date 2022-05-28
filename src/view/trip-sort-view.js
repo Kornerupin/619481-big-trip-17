@@ -1,7 +1,9 @@
 import {createElement} from '../render';
 
 export default class TripSortView {
-  getTemplate() {
+  #element = null;
+
+  get template() {
     return `
       <form class="trip-events__trip-sort  trip-sort" action="#" method="get">
         <div class="trip-sort__item  trip-sort__item--day">
@@ -31,15 +33,15 @@ export default class TripSortView {
       </form>`;
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

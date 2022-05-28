@@ -1,5 +1,5 @@
 import {getRandomFromArray, getAllArrayId, getFormatDayJs} from '../utils';
-import {POINT_TYPES, POINT_PRICES} from '../const';
+import {POINT_TYPES, POINT_PRICES, OFFER_TYPES} from '../const';
 import daysjs from 'dayjs';
 
 const cities = [
@@ -118,7 +118,7 @@ const randomDateDelay = (from) => {
 const getOffer = (type) => ({
   'type': type,
   'data': offerOffers
-    .map((current) => current.typesId.indexOf(POINT_TYPES.indexOf(type)) !== -1 ? current : -1)
+    .map((current) => current.typesId.indexOf(OFFER_TYPES.indexOf(type)) !== -1 ? current : -1)
     .filter((current) => current !== -1),
 });
 

@@ -6,28 +6,36 @@ import TripEventsItemEditView from '../view/trip-events-item-edit-view';
 
 
 export default class ListPresenter {
-  sortComponent = new TripSortView();
-  listComponent = new TripEventsListView();
-  itemsList = [];
+  #tripContainer = null;
+  #pointsModel = null;
+
+  #sortComponent = new TripSortView();
+  #listComponent = new TripEventsListView();
+
+  #itemsList = [];
 
   init = (tripContainer, pointsModel) => {
-    this.tripContainer = tripContainer;
-    this.pointsModel = pointsModel;
-    this.listItems = [...this.pointsModel.getPoints()];
+    this.#tripContainer = tripContainer;
+    this.#pointsModel = pointsModel;
+    this.#itemsList = [...this.#pointsModel.points];
 
-    render(this.sortComponent, this.tripContainer);
-    render(this.listComponent, this.tripContainer);
+    console.log('boo',this.#pointsModel.points);
+    console.log('boo2', [...this.#pointsModel.points]);
+    console.log('boo3',this.#itemsList);
+
+    render(this.#sortComponent, this.#tripContainer);
+    render(this.#listComponent, this.#tripContainer);
 
     // Редактирование без исходных данных = добавление
-    render(new TripEventsItemEditView(), this.listComponent.getElement());
+    render(new TripEventsItemEditView(), this.#listComponent.element);
     // Редактирование с исходными данными
-    render(new TripEventsItemEditView(this.listItems[0]), this.listComponent.getElement());
+    render(new TripEventsItemEditView(this.#itemsList[0]), this.#listComponent.element);
 
-    for (let i = 1; i < this.listItems.length; i++) {
-      const item = new TripEventsItemView(this.listItems[i]);
-      this.itemsList.push(item);
+    for (let i = 1; i < this.#itemsList.length; i++) {
+      const item = new TripEventsItemView(this.#itemsList[i]);
+      this.#itemsList.push(item);
 
-      render(item, this.listComponent.getElement());
+      render(item, this.#listComponent.element);
     }
   };
 }
