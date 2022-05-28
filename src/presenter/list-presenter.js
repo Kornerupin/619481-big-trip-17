@@ -24,11 +24,6 @@ export default class ListPresenter {
     render(this.#sortComponent, this.#tripContainer);
     render(this.#listComponent, this.#tripContainer);
 
-    // Редактирование без исходных данных = добавление
-    // render(new TripEventsItemEditView(), this.#listComponent.element);
-    // Редактирование с исходными данными
-    // render(new TripEventsItemEditView(this.#listItems[0]), this.#listComponent.element);
-
     for (let i = 0; i < this.#listItems.length; i++) {
       this.#renderItem(this.#listItems[i]);
     }

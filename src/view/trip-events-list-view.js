@@ -1,11 +1,11 @@
 import {createElement} from '../render';
 
-export default class TripEventsListView {
+export default class tripEventsListView {
   #element = null;
 
   get template() {
     return `
-      <ul class="trip-events__list">
+      <ul class="trip-events__list"></ul>
     `;
   }
 
