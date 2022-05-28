@@ -13,15 +13,13 @@ export default class ListPresenter {
   #listComponent = new TripEventsListView();
 
   #itemsList = [];
+  #listItems = [];
 
   init = (tripContainer, pointsModel) => {
     this.#tripContainer = tripContainer;
     this.#pointsModel = pointsModel;
-    this.#itemsList = [...this.#pointsModel.points];
 
-    console.log('boo',this.#pointsModel.points);
-    console.log('boo2', [...this.#pointsModel.points]);
-    console.log('boo3',this.#itemsList);
+    this.#listItems = [...this.#pointsModel.points];
 
     render(this.#sortComponent, this.#tripContainer);
     render(this.#listComponent, this.#tripContainer);
@@ -29,10 +27,10 @@ export default class ListPresenter {
     // Редактирование без исходных данных = добавление
     render(new TripEventsItemEditView(), this.#listComponent.element);
     // Редактирование с исходными данными
-    render(new TripEventsItemEditView(this.#itemsList[0]), this.#listComponent.element);
+    render(new TripEventsItemEditView(this.#listItems[0]), this.#listComponent.element);
 
-    for (let i = 1; i < this.#itemsList.length; i++) {
-      const item = new TripEventsItemView(this.#itemsList[i]);
+    for (let i = 1; i < this.#listItems.length; i++) {
+      const item = new TripEventsItemView(this.#listItems[i]);
       this.#itemsList.push(item);
 
       render(item, this.#listComponent.element);
