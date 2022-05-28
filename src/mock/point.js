@@ -115,12 +115,20 @@ const randomDateDelay = (from) => {
     .add(hoursDelay, 'hours');
 };
 
-const getOffer = (type) => ({
-  'type': type,
-  'data': offerOffers
-    .map((current) => current.typesId.indexOf(OFFER_TYPES.indexOf(type)) !== -1 ? current : -1)
-    .filter((current) => current !== -1),
-});
+const getOffer = (type) => {
+  const data = {
+    'type': type,
+    'data': offerOffers
+      .map((current) => current.typesId.indexOf(OFFER_TYPES.indexOf(type)) !== -1 ? current : -1)
+      .filter((current) => current !== -1),
+  };
+
+  data.data.map((current) => {
+    current.isChecked = Math.random() > 0.5;
+  });
+
+  return data;
+};
 
 
 const getPoint = () => {

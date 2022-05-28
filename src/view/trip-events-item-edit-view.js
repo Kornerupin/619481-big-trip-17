@@ -2,13 +2,13 @@ import {createElement} from '../render';
 import {getFormatDayJs, parseDayJs} from '../utils';
 import {POINT_TYPES} from '../const';
 
-const createOfferFromTemplate = (title, price) => `
+const createOfferFromTemplate = (data, id) => `
   <div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${Math.random() > 0.5 ? 'checked' : ''}>
-    <label class="event__offer-label" for="event-offer-luggage-1">
-      <span class="event__offer-title">${title}</span>
+    <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${id}" type="checkbox" name="event-offer-luggage" ${data.isChecked ? 'checked' : ''}>
+    <label class="event__offer-label" for="event-offer-luggage-${id}">
+      <span class="event__offer-title">${data.title}</span>
       &plus;&euro;&nbsp;
-      <span class="event__offer-price">${price}</span>
+      <span class="event__offer-price">${data.price}</span>
     </label>
   </div>
 `;
@@ -17,6 +17,7 @@ const createEventTypeFromTemplate = (type, checkedType, isModeAdd) => {
   if (POINT_TYPES.indexOf(type) === -1) {
     return false;
   }
+
   const textChecked = type === checkedType ? 'checked' : '';
   const textAdd = isModeAdd ? 1 : 0;
 
@@ -71,7 +72,7 @@ const createTemplate = (point = {}) => {
 
   let offersNodes = '';
   for (const current of offers.data) {
-    offersNodes += createOfferFromTemplate(current.title, current.price);
+    offersNodes += createOfferFromTemplate(current, Math.random() * 100000);
   }
   if (!offersNodes) {
     offersNodes = 'No offers';

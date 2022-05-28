@@ -19,7 +19,7 @@ const createTemplate = (point) => {
   let offerItems = '';
 
   point.offers.data.map((current) => {
-    if (Math.floor(Math.random() * 100) > 50) {
+    if (current.isChecked) {
       bonusPrice += current.price;
       offerItems += createOfferItemFromTemplate(current.title, current.price);
     }
