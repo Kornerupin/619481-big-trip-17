@@ -1,4 +1,4 @@
-import {render} from '../framework/render';
+import {render, replace} from '../framework/render';
 import TripSortView from '../view/trip-sort-view';
 import TripEventsListView from '../view/trip-events-list-view';
 import TripEventsItemView from '../view/trip-events-item-view';
@@ -41,11 +41,11 @@ export default class ListPresenter {
   };
 
   #renderItem = (data) => {
-    const item = new TripEventsItemView(data);
-    const itemEdit = new TripEventsItemEditView(data);
+    const itemComponent = new TripEventsItemView(data);
+    const itemEditComponent = new TripEventsItemEditView(data);
 
     const replaceEditToItem = () => {
-      this.#listComponent.element.replaceChild(item.element, itemEdit.element);
+      replace(itemComponent, itemEditComponent);
     };
 
     const onEscKeyDown = (evt) => {
@@ -57,31 +57,29 @@ export default class ListPresenter {
     };
 
     const replaceItemToEdit = () => {
-      this.#listComponent.element.replaceChild(itemEdit.element, item.element);
-      document.addEventListener('keydown', onEscKeyDown);
+      replace(itemEditComponent, itemComponent);
     };
 
-    item.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    itemComponent.setClickHandler(() => {
       replaceItemToEdit();
+      document.addEventListener('keydown', onEscKeyDown);
     });
 
-    itemEdit.element.querySelector('form').addEventListener('submit', (evt) => {
-      evt.preventDefault();
+    itemEditComponent.setSubmitHandler(() => {
       replaceEditToItem();
       document.removeEventListener('keydown', onEscKeyDown);
     });
 
-    itemEdit.element.querySelector('.event__rollup-btn').addEventListener('click', (evt) => {
-      evt.preventDefault();
+    itemEditComponent.setClickHandler(() => {
       replaceEditToItem();
       document.removeEventListener('keydown', onEscKeyDown);
     });
 
     this.#itemsList.push({
-      item,
-      itemEdit
+      itemComponent,
+      itemEditComponent
     });
 
-    render(item, this.#listComponent.element);
+    render(itemComponent, this.#listComponent.element);
   };
 }
