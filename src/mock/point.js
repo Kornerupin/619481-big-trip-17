@@ -100,7 +100,7 @@ const offerOffers = [
 // Стартовая дата - конец следующей рабочей недели
 let dateFrom = daysjs()
   .startOf('week')
-  .add(6, 'day');
+  .add(1, 'day');
 
 const randomDateDelay = (from) => {
   let minutesDelay = Math.floor(Math.random() * 12) * 5;
@@ -153,4 +153,6 @@ const getPoint = () => {
   return result;
 };
 
-export {getPoint};
+const getRandomPseudoCurrentDatetime = (points) => (getRandomFromArray(points).dateFrom);
+
+export {getPoint, getRandomPseudoCurrentDatetime};

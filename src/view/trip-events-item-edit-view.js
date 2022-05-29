@@ -58,7 +58,7 @@ const createEventTypeFromTemplate = (type, checkedType, isModeAdd) => {
     </div>`;
 };
 
-const createTemplate = (point) => {
+const createItemEditTemplate = (point) => {
   const isModeAdd = point === BLANK_POINT;
 
   const {basePrice, destination, type, offers} = point;
@@ -173,7 +173,7 @@ export default class TripEventsItemEditView extends AbstractView {
   }
 
   get template() {
-    return createTemplate(this.#point);
+    return createItemEditTemplate(this.#point);
   }
 
   setSubmitHandler = (callback) => {

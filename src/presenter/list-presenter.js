@@ -4,36 +4,48 @@ import TripEventsListView from '../view/trip-events-list-view';
 import TripEventsItemView from '../view/trip-events-item-view';
 import TripEventsItemEditView from '../view/trip-events-item-edit-view';
 import TripEventsListEmpty from '../view/trip-events-list-empty';
-
+import TripInfoView from '../view/trip-info-view';
+import TripFiltersView from '../view/trip-filters-view';
 
 export default class ListPresenter {
-  #tripContainer = null;
+  #tripEventsContainer = null;
+  #tripMainContainer = null;
+  #tripFilterContainer = null;
   #pointsModel = null;
 
+  #infoComponent = null;
+  #filterComponent = null;
   #sortComponent = new TripSortView();
   #listComponent = new TripEventsListView();
 
   #itemsList = [];
   #listItems = [];
 
-  constructor(tripContainer, pointsModel) {
-    this.#tripContainer = tripContainer;
+  constructor(tripEventsContainer, tripMainContainer, tripFilterContainer, pointsModel) {
+    this.#tripEventsContainer = tripEventsContainer;
+    this.#tripFilterContainer = tripFilterContainer;
+    this.#tripMainContainer = tripMainContainer;
     this.#pointsModel = pointsModel;
   }
 
   init = () => {
     this.#listItems = [...this.#pointsModel.points];
+    this.#infoComponent = new TripInfoView(this.#listItems);
+    this.#filterComponent = new TripFiltersView(this.#listItems);
 
     this.#renderApp();
   };
 
   #renderApp = () => {
     if (this.#listItems.length === 0) {
-      render(new TripEventsListEmpty(), this.#tripContainer);
+      render(new TripEventsListEmpty(), this.#tripEventsContainer);
     }
     else {
-      render(this.#sortComponent, this.#tripContainer);
-      render(this.#listComponent, this.#tripContainer);
+      render(this.#infoComponent, this.#tripMainContainer);
+      render(this.#filterComponent, this.#tripFilterContainer);
+      render(this.#sortComponent, this.#tripEventsContainer);
+      render(this.#listComponent, this.#tripEventsContainer);
+
       for (const current of this.#listItems) {
         this.#renderItem(current);
       }
