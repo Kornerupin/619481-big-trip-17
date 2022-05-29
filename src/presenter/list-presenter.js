@@ -34,8 +34,8 @@ export default class ListPresenter {
     else {
       render(this.#sortComponent, this.#tripContainer);
       render(this.#listComponent, this.#tripContainer);
-      for (let i = 0; i < this.#listItems.length; i++) {
-        this.#renderItem(this.#listItems[i]);
+      for (const current of this.#listItems) {
+        this.#renderItem(current);
       }
     }
   };
@@ -68,16 +68,13 @@ export default class ListPresenter {
     itemEdit.element.querySelector('form').addEventListener('submit', (evt) => {
       evt.preventDefault();
       replaceEditToItem();
+      document.removeEventListener('keydown', onEscKeyDown);
     });
 
     itemEdit.element.querySelector('.event__rollup-btn').addEventListener('click', (evt) => {
       evt.preventDefault();
       replaceEditToItem();
-    });
-
-    itemEdit.element.querySelector('form').addEventListener('submit', (evt) => {
-      evt.preventDefault();
-      replaceEditToItem();
+      document.removeEventListener('keydown', onEscKeyDown);
     });
 
     this.#itemsList.push({
