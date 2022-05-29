@@ -1,6 +1,25 @@
-import {createElement} from '../render';
 import {getFormatDayJs, parseDayJs} from '../utils';
 import {POINT_TYPES} from '../const';
+import AbstractView from '../framework/view/abstract-view';
+
+const BLANK_POINT = {
+  basePrice: 0,
+  destination: {
+    'description': '',
+    'name': '',
+    'pictures': [
+      {
+        'src': '',
+        'description': ''
+      }
+    ]
+  },
+  type: POINT_TYPES[0],
+  offers: {
+    type: POINT_TYPES[0],
+    data: []
+  },
+};
 
 const createOfferFromTemplate = (data, id) => `
   <div class="event__offer-selector">
@@ -39,28 +58,10 @@ const createEventTypeFromTemplate = (type, checkedType, isModeAdd) => {
     </div>`;
 };
 
-const createTemplate = (point = {}) => {
-  const isModeAdd = !Object.values(point).length;
+const createTemplate = (point) => {
+  const isModeAdd = point === BLANK_POINT;
 
-  // Значения по умолчанию
-  const {
-    basePrice = 0,
-    destination = {
-      'description': '',
-      'name': '',
-      'pictures': [
-        {
-          'src': '',
-          'description': ''
-        }
-      ]
-    },
-    type = 'taxi',
-    offers = {
-      type: 'taxi',
-      data: []
-    },
-  } = point;
+  const {basePrice, destination, type, offers} = point;
 
   let events = '';
   for (const current of POINT_TYPES) {
@@ -163,11 +164,11 @@ const createTemplate = (point = {}) => {
   `;
 };
 
-export default class TripEventsItemEditView {
-  #element = null;
+export default class TripEventsItemEditView extends AbstractView {
   #point = null;
 
-  constructor(point) {
+  constructor(point = BLANK_POINT) {
+    super();
     this.#point = point;
   }
 
@@ -175,16 +176,8 @@ export default class TripEventsItemEditView {
     return createTemplate(this.#point);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
   removeElement() {
-    this.#element = null;
+    super.removeElement();
     this.#point = null;
   }
 }

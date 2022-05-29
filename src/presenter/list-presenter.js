@@ -1,4 +1,4 @@
-import {render} from '../render';
+import {render} from '../framework/render';
 import TripSortView from '../view/trip-sort-view';
 import TripEventsListView from '../view/trip-events-list-view';
 import TripEventsItemView from '../view/trip-events-item-view';

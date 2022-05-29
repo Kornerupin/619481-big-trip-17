@@ -1,6 +1,6 @@
-import {createElement} from '../render';
 import {getFormatDayJs, getFormatTime} from '../utils';
 import dayjs from 'dayjs';
+import AbstractView from '../framework/view/abstract-view';
 
 const createOfferItemFromTemplate = (title, price) => `
     <li class="event__offer">
@@ -11,14 +11,14 @@ const createOfferItemFromTemplate = (title, price) => `
   `;
 
 const createTemplate = (point) => {
-  const {type, basePrice, isFavorite} = point;
+  const {type, basePrice, isFavorite, offers, destination} = point;
   const dateFrom = dayjs(point.dateFrom);
   const dateTo = dayjs(point.dateTo);
 
   let bonusPrice = 0;
   let offerItems = '';
 
-  point.offers.data.map((current) => {
+  offers.data.map((current) => {
     if (current.isChecked) {
       bonusPrice += current.price;
       offerItems += createOfferItemFromTemplate(current.title, current.price);
@@ -34,8 +34,7 @@ const createTemplate = (point) => {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
-<!--        <h3 class="event__title">Taxi Amsterdam</h3>-->
-        <h3 class="event__title">${type} ${point.destination?.name}</h3>
+        <h3 class="event__title">${type} ${destination?.name}</h3>
         <div class="event__schedule">
           <p class="event__time">
             <time class="event__start-time" datetime="${dateFrom}">${getFormatDayJs(dateFrom, 'HH:mm')}</time>
@@ -65,11 +64,11 @@ const createTemplate = (point) => {
   `);
 };
 
-export default class TripEventsItemView {
+export default class TripEventsItemView extends AbstractView {
   #point = null;
-  #element = null;
 
   constructor(point) {
+    super();
     this.#point = point;
   }
 
@@ -77,16 +76,8 @@ export default class TripEventsItemView {
     return createTemplate(this.#point);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
   removeElement() {
-    this.#element = null;
+    super.removeElement();
     this.#point = null;
   }
 }

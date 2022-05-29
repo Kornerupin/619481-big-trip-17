@@ -1,7 +1,6 @@
-import {createElement} from '../render';
+import AbstractView from '../framework/view/abstract-view';
 
-export default class TripEventsItemAddView {
-  #element = null;
+export default class TripEventsItemAddView extends AbstractView {
 
   get template() {
     return `
@@ -168,17 +167,5 @@ export default class TripEventsItemAddView {
         </form>
       </li>
     `;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
