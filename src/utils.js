@@ -31,9 +31,11 @@ const getRandomFromArray = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 const parseDayJs = (date) => daysjs.isDayjs(date) ? date : daysjs(date);
 
+const isPointExpired = (point) => point && daysjs().isAfter(daysjs(point));
+
 const getAllArrayId = (baseArr, searchArr) => searchArr
   .map((current) => baseArr.indexOf(current))
   .filter((current) => current !== -1)
   .sort();
 
-export {getRandomFromArray, getAllArrayId, getFormatDayJs, getFormatTime, parseDayJs};
+export {getRandomFromArray, getAllArrayId, getFormatDayJs, getFormatTime, parseDayJs, isPointExpired};
