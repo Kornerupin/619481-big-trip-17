@@ -18,12 +18,12 @@ const createTemplate = (point) => {
   let bonusPrice = 0;
   let offerItems = '';
 
-  offers.data.map((current) => {
+  for (const current of offers.data) {
     if (current.isChecked) {
       bonusPrice += current.price;
       offerItems += createOfferItemFromTemplate(current.title, current.price);
     }
-  });
+  }
 
   const totalPrice = basePrice + bonusPrice;
 
