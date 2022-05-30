@@ -1,24 +1,24 @@
-import {render, replace} from '../framework/render';
+import {render} from '../framework/render';
 import TripSortView from '../view/trip-sort-view';
 import TripEventsListView from '../view/trip-events-list-view';
-import TripEventsItemView from '../view/trip-events-item-view';
-import TripEventsItemEditView from '../view/trip-events-item-edit-view';
 import TripEventsListEmpty from '../view/trip-events-list-empty';
 import TripInfoView from '../view/trip-info-view';
 import TripFiltersView from '../view/trip-filters-view';
+import PointPresenter from './point-presenter';
 
 export default class ListPresenter {
   #tripEventsContainer = null;
   #tripMainContainer = null;
   #tripFilterContainer = null;
+
   #pointsModel = null;
 
   #infoComponent = null;
   #filterComponent = null;
-  #sortComponent = new TripSortView();
-  #listComponent = new TripEventsListView();
+  #sortComponent = null;
+  #listComponent = null;
+  #listEmptyComponent = null;
 
-  #itemsList = [];
   #listItems = [];
 
   constructor(tripEventsContainer, tripMainContainer, tripFilterContainer, pointsModel) {
@@ -36,62 +36,54 @@ export default class ListPresenter {
     this.#renderApp();
   };
 
-  #renderApp = () => {
-    if (this.#listItems.length === 0) {
-      render(new TripEventsListEmpty(), this.#tripEventsContainer);
-    }
-    else {
-      render(this.#infoComponent, this.#tripMainContainer);
-      render(this.#filterComponent, this.#tripFilterContainer);
-      render(this.#sortComponent, this.#tripEventsContainer);
-      render(this.#listComponent, this.#tripEventsContainer);
+  #renderItem = (point) => {
+    const pointPresenter = new PointPresenter(this.#listComponent.element);
+    pointPresenter.init(point);
+  };
 
-      for (const current of this.#listItems) {
-        this.#renderItem(current);
-      }
+  #renderSort = () => {
+    render(this.#sortComponent, this.#tripEventsContainer);
+  };
+
+  #renderInfo = () => {
+    if (this.#sortComponent === null) {
+      this.#sortComponent = new TripSortView();
+    }
+    render(this.#infoComponent, this.#tripMainContainer);
+  };
+
+  #renderFilter = () => {
+    render(this.#filterComponent, this.#tripFilterContainer);
+  };
+
+  #renderList = () => {
+    if (this.#listComponent === null) {
+      this.#listComponent = new TripEventsListView();
+    }
+    render(this.#listComponent, this.#tripEventsContainer);
+
+    for (const current of this.#listItems) {
+      this.#renderItem(current);
     }
   };
 
-  #renderItem = (data) => {
-    const itemComponent = new TripEventsItemView(data);
-    const itemEditComponent = new TripEventsItemEditView(data);
+  #renderListEmpty = () => {
+    if (this.#listEmptyComponent === null) {
+      this.#listEmptyComponent = new TripEventsListEmpty();
+    }
+    render(this.#listEmptyComponent, this.#tripEventsContainer);
+  };
 
-    const replaceEditToItem = () => {
-      replace(itemComponent, itemEditComponent);
-    };
+  #renderApp = () => {
+    if (this.#listItems.length === 0) {
+      this.#renderListEmpty();
+    }
+    else {
+      this.#renderInfo();
+      this.#renderFilter();
+      this.#renderSort();
 
-    const onEscKeyDown = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        replaceEditToItem();
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-    };
-
-    const replaceItemToEdit = () => {
-      replace(itemEditComponent, itemComponent);
-    };
-
-    itemComponent.setClickHandler(() => {
-      replaceItemToEdit();
-      document.addEventListener('keydown', onEscKeyDown);
-    });
-
-    itemEditComponent.setSubmitHandler(() => {
-      replaceEditToItem();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
-
-    itemEditComponent.setClickHandler(() => {
-      replaceEditToItem();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
-
-    this.#itemsList.push({
-      itemComponent,
-      itemEditComponent
-    });
-
-    render(itemComponent, this.#listComponent.element);
+      this.#renderList();
+    }
   };
 }
