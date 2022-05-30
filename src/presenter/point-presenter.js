@@ -1,6 +1,7 @@
 import TripEventsItemView from '../view/trip-events-item-view';
 import TripEventsItemEditView from '../view/trip-events-item-edit-view';
 import {render, replace, remove} from '../framework/render';
+import {POINT_MODES} from '../const';
 
 export default class PointPresenter {
   #listContainer = null;
@@ -10,8 +11,15 @@ export default class PointPresenter {
 
   #point = null;
 
-  constructor(listContainer) {
+  #changeData = null;
+  #changeMode = null;
+
+  #mode = POINT_MODES.DEFAULT;
+
+  constructor(listContainer, changeData, changeMode) {
     this.#listContainer = listContainer;
+    this.#changeData = changeData;
+    this.#changeMode = changeMode;
   }
 
   init = (point) => {
@@ -35,11 +43,11 @@ export default class PointPresenter {
 
     // При повторном обращении - перерисовываем компоненты.
     // За счёт проверки наличия в DOM, всегда заменяется только один компонент (существующий в списке)
-    if (this.#listContainer.contains(oldItemComponent.element)) {
+    if (this.#mode === POINT_MODES.DEFAULT) {
       replace(this.#itemComponent, oldItemComponent);
     }
 
-    if (this.#listContainer.contains(oldItemEditComponent.element)) {
+    if (this.#mode === POINT_MODES.EDIT) {
       replace(this.#itemEditComponent, oldItemEditComponent);
     }
 
@@ -47,9 +55,16 @@ export default class PointPresenter {
     remove(oldItemEditComponent);
   };
 
+  resetView = () => {
+    if (this.#mode === POINT_MODES.EDIT) {
+      this.#replaceEditToItem();
+    }
+  };
+
   #replaceEditToItem = () => {
     replace(this.#itemComponent, this.#itemEditComponent);
     document.removeEventListener('keydown', this.#onEscKeyDown);
+    this.#mode = POINT_MODES.DEFAULT;
   };
 
   #onEscKeyDown = (evt) => {
@@ -60,8 +75,10 @@ export default class PointPresenter {
   };
 
   #replaceItemToEdit = () => {
+    this.#changeMode();
     replace(this.#itemEditComponent, this.#itemComponent);
     document.addEventListener('keydown', this.#onEscKeyDown);
+    this.#mode = POINT_MODES.EDIT;
   };
 
   #handlerItemClick = () => {
@@ -69,6 +86,7 @@ export default class PointPresenter {
   };
 
   #handlerItemSubmit = () => {
+    // this.#changeData(updateItem);
     this.#replaceEditToItem();
   };
 
@@ -77,8 +95,7 @@ export default class PointPresenter {
   };
 
   #handlerToggleFavorite = () => {
-    this.#point.isFavorite = !this.#point.isFavorite;
-    this.init(this.#point);
+    this.#changeData({...this.#point, isFavorite: !this.#point.isFavorite});
   };
 
   destroy = () => {

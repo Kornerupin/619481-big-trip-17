@@ -38,4 +38,26 @@ const getAllArrayId = (baseArr, searchArr) => searchArr
   .filter((current) => current !== -1)
   .sort();
 
-export {getRandomFromArray, getAllArrayId, getFormatDayJs, getFormatTime, parseDayJs, isPointExpired};
+const updateItem = (items, update) => {
+  const index = items.findIndex((item) => item.id === update.id);
+
+  if (index === -1) {
+    return items;
+  }
+
+  return [
+    ...items.slice(0, index),
+    update,
+    ...items.slice(index + 1)
+  ];
+};
+
+export {
+  getRandomFromArray,
+  getAllArrayId,
+  getFormatDayJs,
+  getFormatTime,
+  parseDayJs,
+  isPointExpired,
+  updateItem
+};

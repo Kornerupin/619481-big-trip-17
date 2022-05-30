@@ -5,6 +5,7 @@ import TripEventsListEmpty from '../view/trip-events-list-empty';
 import TripInfoView from '../view/trip-info-view';
 import TripFiltersView from '../view/trip-filters-view';
 import PointPresenter from './point-presenter';
+import {updateItem} from '../utils';
 
 export default class ListPresenter {
   #tripEventsContainer = null;
@@ -20,6 +21,7 @@ export default class ListPresenter {
   #listEmptyComponent = null;
 
   #listItems = [];
+  #itemsPresenters = new Map();
 
   constructor(tripEventsContainer, tripMainContainer, tripFilterContainer, pointsModel) {
     this.#tripEventsContainer = tripEventsContainer;
@@ -36,9 +38,19 @@ export default class ListPresenter {
     this.#renderApp();
   };
 
+  #handleItemChange = (updatedItem) => {
+    this.#listItems = updateItem(this.#listItems, updatedItem);
+    this.#itemsPresenters.get(updatedItem.id).init(updatedItem);
+  };
+
+  #handleModeChange = () => {
+    this.#itemsPresenters.forEach((presenter) => presenter.resetView());
+  };
+
   #renderItem = (point) => {
-    const pointPresenter = new PointPresenter(this.#listComponent.element);
+    const pointPresenter = new PointPresenter(this.#listComponent.element, this.#handleItemChange, this.#handleModeChange);
     pointPresenter.init(point);
+    this.#itemsPresenters.set(point.id, pointPresenter);
   };
 
   #renderSort = () => {

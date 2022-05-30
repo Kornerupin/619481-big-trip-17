@@ -1,6 +1,7 @@
 import {getRandomFromArray, getAllArrayId, getFormatDayJs} from '../utils';
 import {POINT_TYPES, POINT_PRICES, OFFER_TYPES} from '../const';
 import daysjs from 'dayjs';
+import {nanoid} from 'nanoid';
 
 const cities = [
   {
@@ -139,6 +140,7 @@ const getPoint = () => {
   const dateTo = randomDateDelay(dateFrom);
 
   const result = {
+    'id': nanoid(),
     'basePrice': POINT_PRICES[typeId],
     'dateFrom': getFormatDayJs(dateFrom),
     'dateTo': getFormatDayJs(dateTo),
