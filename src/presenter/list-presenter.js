@@ -5,7 +5,8 @@ import TripEventsListEmpty from '../view/trip-events-list-empty';
 import TripInfoView from '../view/trip-info-view';
 import TripFiltersView from '../view/trip-filters-view';
 import PointPresenter from './point-presenter';
-import {updateItem} from '../utils';
+import {sorts, updateItem} from '../utils';
+import {sortData} from '../mock/sort';
 
 export default class ListPresenter {
   #tripEventsContainer = null;
@@ -20,6 +21,7 @@ export default class ListPresenter {
   #listComponent = null;
   #listEmptyComponent = null;
 
+  #sortItems = sortData;
   #listItems = [];
   #itemsPresenters = new Map();
 
@@ -54,12 +56,23 @@ export default class ListPresenter {
   };
 
   #renderSort = () => {
+    if (this.#sortComponent === null) {
+      this.#sortComponent = new TripSortView(this.#sortItems);
+      this.#sortComponent.setSortModeChangeHandler(this.#handlerSortChange);
+    }
+
     render(this.#sortComponent, this.#tripEventsContainer);
   };
 
+  #handlerSortChange = (sortMode) => {
+    sorts[sortMode](this.#listItems);
+    this.#clearList();
+    this.#renderApp();
+  };
+
   #renderInfo = () => {
-    if (this.#sortComponent === null) {
-      this.#sortComponent = new TripSortView();
+    if (this.#infoComponent === null) {
+      this.#infoComponent = new TripInfoView();
     }
     render(this.#infoComponent, this.#tripMainContainer);
   };
@@ -84,6 +97,11 @@ export default class ListPresenter {
       this.#listEmptyComponent = new TripEventsListEmpty();
     }
     render(this.#listEmptyComponent, this.#tripEventsContainer);
+  };
+
+  #clearList = () => {
+    this.#itemsPresenters.forEach((presenter) => presenter.destroy());
+    this.#itemsPresenters.clear();
   };
 
   #renderApp = () => {

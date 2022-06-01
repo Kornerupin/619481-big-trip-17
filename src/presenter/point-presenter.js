@@ -99,7 +99,7 @@ export default class PointPresenter {
   };
 
   destroy = () => {
-    this.#itemComponent = null;
-    this.#itemEditComponent = null;
+    remove(this.#itemComponent);
+    remove(this.#itemEditComponent);
   };
 }
