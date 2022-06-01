@@ -1,19 +1,19 @@
-const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
-const POINT_PRICES = [100, 20, 50, 200, 100, 500, 50, 80, 100];
-const OFFER_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+const PointTypes = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+const PointPrices = [100, 20, 50, 200, 100, 500, 50, 80, 100];
+const OfferTypes = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
-const FILTER_TYPES = {
+const FilterTypes = {
   EVERYTHING: 'Everything',
   FUTURE: 'Future',
   PAST: 'Past',
 };
 
-const POINT_MODES = {
+const PointModes = {
   DEFAULT: 'DEFAULT',
   EDIT: 'EDIT',
 };
 
-const SORT_MODES = {
+const SortModes = {
   DAY: 'Day',
   EVENT: 'Event',
   TIME: 'Time',
@@ -21,4 +21,4 @@ const SORT_MODES = {
   OFFERS: 'Offers',
 };
 
-export {POINT_TYPES, POINT_PRICES, OFFER_TYPES, FILTER_TYPES, POINT_MODES, SORT_MODES};
+export {PointTypes, PointPrices, OfferTypes, FilterTypes, PointModes, SortModes};

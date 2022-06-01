@@ -46,10 +46,7 @@ export default class TripSortView extends AbstractView {
 
   setSortModeChangeHandler = (callback) => {
     this._callback.inputClick = callback;
-    const sortItems = this.element.querySelectorAll('.trip-sort__item');
-    for (const item of sortItems) {
-      item.addEventListener('input', this.#sortModeChangeHandler);
-    }
+    this.element.addEventListener('change', this.#sortModeChangeHandler);
   };
 
   #sortModeChangeHandler = (evt) => {

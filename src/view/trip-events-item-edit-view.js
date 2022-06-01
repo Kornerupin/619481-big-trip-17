@@ -1,5 +1,5 @@
 import {getFormatDayJs, parseDayJs} from '../utils';
-import {POINT_TYPES} from '../const';
+import {PointTypes} from '../const';
 import AbstractView from '../framework/view/abstract-view';
 
 const BLANK_POINT = {
@@ -14,9 +14,9 @@ const BLANK_POINT = {
       }
     ]
   },
-  type: POINT_TYPES[0],
+  type: PointTypes[0],
   offers: {
-    type: POINT_TYPES[0],
+    type: PointTypes[0],
     data: []
   },
 };
@@ -33,7 +33,7 @@ const createOfferFromTemplate = (data, id) => `
 `;
 
 const createEventTypeFromTemplate = (type, checkedType, isModeAdd) => {
-  if (POINT_TYPES.indexOf(type) === -1) {
+  if (PointTypes.indexOf(type) === -1) {
     return false;
   }
 
@@ -64,7 +64,7 @@ const createItemEditTemplate = (point) => {
   const {basePrice, destination, type, offers} = point;
 
   let events = '';
-  for (const current of POINT_TYPES) {
+  for (const current of PointTypes) {
     events+= createEventTypeFromTemplate(current, type, isModeAdd);
   }
 

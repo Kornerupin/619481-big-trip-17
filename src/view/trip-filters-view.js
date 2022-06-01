@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import {FILTER_TYPES} from '../const';
+import {FilterTypes} from '../const';
 
 const createFilterTemplate = (type) => {
   const textChecked = type === 'EVERYTHING' ? 'checked' : '';
@@ -14,7 +14,7 @@ const createFilterTemplate = (type) => {
 const createFiltersFormTemplate = () => {
   let filters = '';
 
-  for (const current in FILTER_TYPES) {
+  for (const current in FilterTypes) {
     filters += createFilterTemplate(current);
   }
 

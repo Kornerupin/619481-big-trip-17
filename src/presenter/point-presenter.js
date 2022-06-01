@@ -1,7 +1,7 @@
 import TripEventsItemView from '../view/trip-events-item-view';
 import TripEventsItemEditView from '../view/trip-events-item-edit-view';
 import {render, replace, remove} from '../framework/render';
-import {POINT_MODES} from '../const';
+import {PointModes} from '../const';
 
 export default class PointPresenter {
   #listContainer = null;
@@ -14,7 +14,7 @@ export default class PointPresenter {
   #changeData = null;
   #changeMode = null;
 
-  #mode = POINT_MODES.DEFAULT;
+  #mode = PointModes.DEFAULT;
 
   constructor(listContainer, changeData, changeMode) {
     this.#listContainer = listContainer;
@@ -43,11 +43,11 @@ export default class PointPresenter {
 
     // При повторном обращении - перерисовываем компоненты.
     // За счёт проверки наличия в DOM, всегда заменяется только один компонент (существующий в списке)
-    if (this.#mode === POINT_MODES.DEFAULT) {
+    if (this.#mode === PointModes.DEFAULT) {
       replace(this.#itemComponent, oldItemComponent);
     }
 
-    if (this.#mode === POINT_MODES.EDIT) {
+    if (this.#mode === PointModes.EDIT) {
       replace(this.#itemEditComponent, oldItemEditComponent);
     }
 
@@ -56,7 +56,7 @@ export default class PointPresenter {
   };
 
   resetView = () => {
-    if (this.#mode === POINT_MODES.EDIT) {
+    if (this.#mode === PointModes.EDIT) {
       this.#replaceEditToItem();
     }
   };
@@ -64,7 +64,7 @@ export default class PointPresenter {
   #replaceEditToItem = () => {
     replace(this.#itemComponent, this.#itemEditComponent);
     document.removeEventListener('keydown', this.#onEscKeyDown);
-    this.#mode = POINT_MODES.DEFAULT;
+    this.#mode = PointModes.DEFAULT;
   };
 
   #onEscKeyDown = (evt) => {
@@ -78,7 +78,7 @@ export default class PointPresenter {
     this.#changeMode();
     replace(this.#itemEditComponent, this.#itemComponent);
     document.addEventListener('keydown', this.#onEscKeyDown);
-    this.#mode = POINT_MODES.EDIT;
+    this.#mode = PointModes.EDIT;
   };
 
   #handlerItemClick = () => {

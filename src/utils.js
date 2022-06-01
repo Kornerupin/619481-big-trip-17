@@ -1,5 +1,5 @@
 import daysjs from 'dayjs';
-import {OFFER_TYPES, SORT_MODES} from './const';
+import {OfferTypes, SortModes} from './const';
 
 const getFormatDayJs = (date, format = 'YYYY-MM-DDTHH:mm:ss.SSS[Z]') => daysjs.isDayjs(date) ? date.format(format) : false;
 
@@ -54,26 +54,26 @@ const updateItem = (items, update) => {
 };
 
 const sorts = {
-  [SORT_MODES.DAY]: (items) => items.sort((a, b) => (parseDayJs(a.dateFrom).diff(parseDayJs(b.dateFrom)))),
-  [SORT_MODES.TIME]: (items) => items.sort((a, b) => {
+  [SortModes.DAY]: (items) => items.sort((a, b) => (parseDayJs(a.dateFrom).diff(parseDayJs(b.dateFrom)))),
+  [SortModes.TIME]: (items) => items.sort((a, b) => {
     const aTime = Math.abs(parseDayJs(b.dateFrom).diff(parseDayJs(b.dateTo)));
     const bTime = Math.abs(parseDayJs(a.dateFrom).diff(a.dateTo));
 
     return (aTime - bTime);
   }),
-  [SORT_MODES.OFFERS]: (items) => items.sort((a, b) => {
+  [SortModes.OFFERS]: (items) => items.sort((a, b) => {
     const aOffersCount = a.offers.data.reduce((count, currentOffer) => (count += currentOffer.isChecked ? 1 : 0), 0);
     const bOffersCount = (b.offers.data.reduce((count, currentOffer) => (count += currentOffer.isChecked ? 1 : 0), 0));
 
     return -(aOffersCount - bOffersCount);
   }),
-  [SORT_MODES.PRICE]: (items) => items.sort((a, b) => {
+  [SortModes.PRICE]: (items) => items.sort((a, b) => {
     const aTotalPrice = a.basePrice + a.offers.data.reduce((sum, currentOffer) => (sum += currentOffer.isChecked ? currentOffer.price : 0), 0);
     const bTotalPrice = b.basePrice + b.offers.data.reduce((sum, currentOffer) => (sum += currentOffer.isChecked ? currentOffer.price : 0), 0);
 
     return (bTotalPrice - aTotalPrice);
   }),
-  [SORT_MODES.EVENT]: (items) => items.sort((a, b) => (OFFER_TYPES.indexOf(a.type) - OFFER_TYPES.indexOf(b.type))),
+  [SortModes.EVENT]: (items) => items.sort((a, b) => (OfferTypes.indexOf(a.type) - OfferTypes.indexOf(b.type))),
 };
 
 export {

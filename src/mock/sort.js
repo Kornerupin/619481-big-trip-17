@@ -1,11 +1,11 @@
-import {SORT_MODES} from '../const';
+import {SortModes} from '../const';
 
 const sortData = [
-  {'name': SORT_MODES.DAY, 'isChecked': false, 'isDisabled': false},
-  {'name': SORT_MODES.EVENT, 'isChecked': false, 'isDisabled': false},
-  {'name': SORT_MODES.TIME, 'isChecked': false, 'isDisabled': false},
-  {'name': SORT_MODES.PRICE, 'isChecked': false, 'isDisabled': false},
-  {'name': SORT_MODES.OFFERS, 'isChecked': false, 'isDisabled': false},
+  {'name': SortModes.DAY, 'isChecked': false, 'isDisabled': false},
+  {'name': SortModes.EVENT, 'isChecked': false, 'isDisabled': false},
+  {'name': SortModes.TIME, 'isChecked': false, 'isDisabled': false},
+  {'name': SortModes.PRICE, 'isChecked': false, 'isDisabled': false},
+  {'name': SortModes.OFFERS, 'isChecked': false, 'isDisabled': false},
 ];
 
 export {sortData};
