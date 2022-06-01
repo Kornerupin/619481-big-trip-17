@@ -62,8 +62,8 @@ const sorts = {
     return (aTime - bTime);
   }),
   [SORT_MODES.OFFERS]: (items) => items.sort((a, b) => {
-    const aOffersCount = a.offers.data.reduce((count, offer) => (count += offer.isChecked ? 1 : 0), 0);
-    const bOffersCount = (b.offers.data.reduce((count, offer) => (count += offer.isChecked ? 1 : 0), 0));
+    const aOffersCount = a.offers.data.reduce((count, currentOffer) => (count += currentOffer.isChecked ? 1 : 0), 0);
+    const bOffersCount = (b.offers.data.reduce((count, currentOffer) => (count += currentOffer.isChecked ? 1 : 0), 0));
 
     return -(aOffersCount - bOffersCount);
   }),
