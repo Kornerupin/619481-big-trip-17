@@ -85,7 +85,8 @@ export default class PointPresenter {
     this.#replaceItemToEdit();
   };
 
-  #handlerItemSubmit = () => {
+  #handlerItemSubmit = (newData) => {
+    this.#changeData({...this.#point, ...newData});
     this.#replaceEditToItem();
   };
 
