@@ -211,6 +211,12 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
     this.setClickHandler(this._callback.click);
   };
 
+  reset = (task) => {
+    this.updateElement(
+      TripEventsItemEditView.parseItemToState(task)
+    );
+  };
+
   #setInnerHandlers = () => {
     this.element.querySelector('.event--edit')
       .addEventListener('change', this.#innerFormHandler);
