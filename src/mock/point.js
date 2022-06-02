@@ -9,7 +9,15 @@ const cities = [
     'name': 'Chamonix',
     'pictures': [
       {
-        'src': 'http://picsum.photos/300/200?r=0.0762563005163317',
+        'src': 'https://www.touristsecrets.com/wp-content/uploads/2019/11/Hotel-Mont-Blanc-French-Alps.jpg',
+        'description': 'Chamonix parliament building'
+      },
+      {
+        'src': 'https://i09.fotocdn.net/s110/b69618d84d63079e/gallery_m/2443063586.jpg',
+        'description': 'Chamonix parliament building'
+      },
+      {
+        'src': 'https://images.musement.com/cover/0001/55/chamonix-mont-blanc-day-trip-from-geneva_header-54010.jpeg?w=1200&amp;h=630&amp;q=95&amp;fit=crop',
         'description': 'Chamonix parliament building'
       }
     ]
@@ -19,9 +27,17 @@ const cities = [
     'name': 'Amsterdam',
     'pictures': [
       {
-        'src': 'http://picsum.photos/300/200?r=0.0762563005163317',
+        'src': 'https://www.mondestay.com/jp/media/wp-content/uploads/2017/10/amsterdam-2203076_640-iloveimg-resized.jpg',
         'description': 'Amsterdam some picture'
-      }
+      },
+      {
+        'src': 'https://www.istmira.com/uploads/posts/2020-01/1579566669_peshehodnye-ekskursii-po-kanalam-amsterdama-na-russkom-yazyke.jpg',
+        'description': 'Amsterdam some picture'
+      },
+      {
+        'src': 'https://img4.goodfon.ru/original/800x480/1/76/gorod-amsterdam-noch-ogni.jpg',
+        'description': 'Amsterdam some picture'
+      },
     ]
   },
   {
@@ -29,9 +45,17 @@ const cities = [
     'name': 'Geneva',
     'pictures': [
       {
-        'src': 'http://picsum.photos/300/200?r=0.0762563005163317',
+        'src': 'https://cache.erashop.net/1726/img/13/30/milan-geneva.jpg',
         'description': 'Geneva some picture'
-      }
+      },
+      {
+        'src': 'https://kartami.ru/img/city/geneva.jpg',
+        'description': 'Geneva some picture'
+      },
+      {
+        'src': 'http://www.strumabroker.eu/StrumaBroker/uploadsT/703_0.jpg',
+        'description': 'Geneva some picture'
+      },
     ]
   },
 ];
@@ -116,7 +140,7 @@ const randomDateDelay = (from) => {
     .add(hoursDelay, 'hours');
 };
 
-const getOffer = (type) => {
+const getOffer = (type, random = false) => {
   const data = {
     'type': type,
     'data': offerOffers
@@ -125,8 +149,18 @@ const getOffer = (type) => {
   };
 
   data.data.map((current) => {
-    current.isChecked = Math.random() > 0.5;
+    current.offerId = nanoid();
   });
+
+  if (random) {
+    data.data.map((current) => {
+      current.isChecked = Math.random() > 0.5;
+    });
+  } else {
+    data.data.map((current) => {
+      current.isChecked = false;
+    });
+  }
 
   return data;
 };
@@ -147,7 +181,7 @@ const getPoint = () => {
     'destination': destination,
     'isFavorite': Math.random() > 0.5,
     'type': type,
-    'offers': getOffer(type),
+    'offers': getOffer(type, true),
   };
 
   dateFrom = dateTo;
@@ -157,4 +191,4 @@ const getPoint = () => {
 
 const getRandomPseudoCurrentDatetime = (points) => (getRandomFromArray(points).dateFrom);
 
-export {getPoint, getRandomPseudoCurrentDatetime};
+export {getPoint, getOffer, getRandomPseudoCurrentDatetime, cities};

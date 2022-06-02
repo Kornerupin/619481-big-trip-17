@@ -33,7 +33,7 @@ export default class PointPresenter {
 
     this.#itemComponent.setClickHandler(this.#handlerItemClick);
     this.#itemComponent.setToggleFavoriteHandler(this.#handlerToggleFavorite);
-    this.#itemEditComponent.setSubmitHandler(this.#handlerItemSubmit);
+    this.#itemEditComponent.setFormSubmitHandler(this.#handlerItemSubmit);
     this.#itemEditComponent.setClickHandler(this.#handlerItemEditClick);
 
     if (oldItemComponent === null || oldItemEditComponent === null) {
@@ -86,7 +86,6 @@ export default class PointPresenter {
   };
 
   #handlerItemSubmit = () => {
-    // this.#changeData(updateItem);
     this.#replaceEditToItem();
   };
 

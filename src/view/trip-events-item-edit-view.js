@@ -1,6 +1,8 @@
 import {getFormatDayJs, parseDayJs} from '../utils';
 import {PointTypes} from '../const';
-import AbstractView from '../framework/view/abstract-view';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view';
+import cloneDeep from 'clone-deep';
+import {cities, getOffer} from '../mock/point';
 
 const BLANK_POINT = {
   basePrice: 0,
@@ -21,16 +23,27 @@ const BLANK_POINT = {
   },
 };
 
-const createOfferFromTemplate = (data, id) => `
-  <div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${id}" type="checkbox" name="event-offer-luggage" ${data.isChecked ? 'checked' : ''}>
-    <label class="event__offer-label" for="event-offer-luggage-${id}">
-      <span class="event__offer-title">${data.title}</span>
-      &plus;&euro;&nbsp;
-      <span class="event__offer-price">${data.price}</span>
-    </label>
-  </div>
-`;
+const createOfferFromTemplate = (data) => {
+  const {offerId, title, price, isChecked} = data;
+  const checkedText = isChecked ? 'checked' : '';
+
+  return `
+    <div class="event__offer-selector">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${offerId}" data-offer-id="${offerId}" type="checkbox" name="event-offer-luggage" ${checkedText}>
+      <label class="event__offer-label" for="event-offer-luggage-${offerId}">
+        <span class="event__offer-title">${title}</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">${price}</span>
+      </label>
+    </div>
+  `;
+};
+
+const createPictureFromTemplate = (data) => {
+  const {src, description} = data;
+
+  return `<img class="event__photo" src="${src}" alt="${description}">`;
+};
 
 const createEventTypeFromTemplate = (type, checkedType, isModeAdd) => {
   if (PointTypes.indexOf(type) === -1) {
@@ -73,7 +86,7 @@ const createItemEditTemplate = (point) => {
 
   let offersNodes = '';
   for (const current of offers.data) {
-    offersNodes += createOfferFromTemplate(current, Math.random() * 100000);
+    offersNodes += createOfferFromTemplate(current);
   }
   if (!offersNodes) {
     offersNodes = 'No offers';
@@ -81,7 +94,10 @@ const createItemEditTemplate = (point) => {
 
   const cityName = destination.name;
 
-  const cityDescription = destination.description;
+  const destinationDescription = destination.description;
+  const destinationPictures = destination.pictures.map(
+    (current) => createPictureFromTemplate(current)
+  ).join();
 
   const eventStartTime = getFormatDayJs(parseDayJs(dateFrom), 'DD/MM/YY HH:mm');
   const eventEndTime = getFormatDayJs(parseDayJs(dateTo), 'DD/MM/YY HH:mm');
@@ -156,7 +172,12 @@ const createItemEditTemplate = (point) => {
 
           <section class="event__section  event__section--destination">
             <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${cityDescription}</p>
+            <p class="event__destination-description">${destinationDescription}</p>
+            <div class="event__photos-container">
+              <div class="event__photos-tape">
+                ${destinationPictures}
+              </div>
+            </div>
           </section>
         </section>
       </form>
@@ -164,32 +185,78 @@ const createItemEditTemplate = (point) => {
   `;
 };
 
-export default class TripEventsItemEditView extends AbstractView {
-  #point = null;
-
+export default class TripEventsItemEditView extends AbstractStatefulView {
   constructor(point = BLANK_POINT) {
     super();
-    this.#point = point;
+    this._state = TripEventsItemEditView.parseItemToState(point);
+    this._restoreHandlers();
   }
 
   get template() {
-    return createItemEditTemplate(this.#point);
+    return createItemEditTemplate(this._state);
   }
 
-  setSubmitHandler = (callback) => {
-    this._callback.submit = callback;
+  static parseItemToState = (item) => ({
+    ...cloneDeep(item),
+    totalPrice: item.basePrice + item.offers.data.reduce((sum, currentOffer) => (sum += currentOffer.price), 0),
+  });
 
-    this.element.querySelector('form').addEventListener('submit', this.#submitHandler);
+  static parseStateToTask = (state) => ({
+    ...cloneDeep(state)
+  });
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setClickHandler(this._callback.click);
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event--edit')
+      .addEventListener('change', this.#innerFormHandler);
+  };
+
+  #innerFormHandler = (evt) => {
+    const changedElement = evt.target;
+
+    if (changedElement.classList.contains('event__type-input')) {
+      this.updateElement({
+        type: evt.target.value,
+        offers: getOffer(evt.target.value),
+      });
+    }
+
+    if (changedElement.classList.contains('event__offer-checkbox')) {
+      const changedOffer = this._state.offers.data.find((current) => current.offerId === evt.target.dataset.offerId);
+      changedOffer.isChecked = !changedOffer.isChecked;
+
+      this.updateElement({
+        offers: this._state.offers,
+      });
+    }
+
+    if (changedElement.classList.contains('event__input--destination')) {
+      this.updateElement({
+        destination: cities.find((current) => current.name === evt.target.value),
+      });
+    }
+  };
+
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.querySelector('form')
+      .addEventListener('submit', this.#formSubmitHandler);
   };
 
   setClickHandler = (callback) => {
     this._callback.click = callback;
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#clickHandler);
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#clickHandler);
   };
 
-  #submitHandler = (evt) => {
+  #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this._callback.submit();
+    this._callback.formSubmit(TripEventsItemEditView.parseStateToTask(this._state));
   };
 
   #clickHandler = (evt) => {
