@@ -3,6 +3,9 @@ import {PointTypes} from '../const';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import cloneDeep from 'clone-deep';
 import {cities, getOffer} from '../mock/point';
+import flatpickr from 'flatpickr';
+
+import 'flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
   basePrice: 0,
@@ -29,8 +32,8 @@ const createOfferFromTemplate = (data) => {
 
   return `
     <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${offerId}" data-offer-id="${offerId}" type="checkbox" name="event-offer-luggage" ${checkedText}>
-      <label class="event__offer-label" for="event-offer-luggage-${offerId}">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offerId}" type="checkbox" name="event-offer-${offerId}" ${checkedText}>
+      <label class="event__offer-label" for="event-offer-${offerId}">
         <span class="event__offer-title">${title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${price}</span>
@@ -141,10 +144,12 @@ const createItemEditTemplate = (point) => {
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${eventStartTime}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time"
+                style="text-align: left;padding-left: 5px;box-sizing: border-box;" value="${eventStartTime}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${eventEndTime}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time"
+                style="cursor: pointer" readonly value="${eventEndTime}">
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -186,6 +191,12 @@ const createItemEditTemplate = (point) => {
 };
 
 export default class TripEventsItemEditView extends AbstractStatefulView {
+  #dateStartPicker = null;
+  #dateStartPickerElement = null;
+  #dateEndPicker = null;
+  #dateEndPickerElement = null;
+  #datePickerVirtualInput = null;
+
   constructor(point = BLANK_POINT) {
     super();
     this._state = TripEventsItemEditView.parseItemToState(point);
@@ -209,6 +220,8 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setClickHandler(this._callback.click);
+    this.#setDatepicker();
+    this.#setDateByState();
   };
 
   reset = (task) => {
@@ -223,27 +236,126 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
   };
 
   #innerFormHandler = (evt) => {
-    const changedElement = evt.target;
+    // const changedElement = evt.target;
+    const formData = new FormData(evt.currentTarget);
 
-    if (changedElement.classList.contains('event__type-input')) {
+    const eventType = formData.get('event-type');
+    if (eventType !== this._state.type) {
       this.updateElement({
-        type: evt.target.value,
-        offers: getOffer(evt.target.value),
+        type: eventType,
+        offers: getOffer(eventType),
       });
     }
 
-    if (changedElement.classList.contains('event__offer-checkbox')) {
-      const changedOffer = this._state.offers.data.find((current) => current.offerId === evt.target.dataset.offerId);
-      changedOffer.isChecked = !changedOffer.isChecked;
-
-      this.updateElement({
-        offers: this._state.offers,
-      });
+    for(const eventOffer of this._state.offers.data) {
+      const eventOfferData = !!formData.get(`event-offer-${eventOffer.offerId}`);
+      if (eventOfferData !== eventOffer.isChecked) {
+        const updateOffers = cloneDeep(this._state.offers);
+        const updateItem = updateOffers.data.find((current) => current.offerId === eventOffer.offerId);
+        updateItem.isChecked = eventOfferData;
+        this.updateElement({
+          offers: updateOffers,
+        });
+      }
     }
 
-    if (changedElement.classList.contains('event__input--destination')) {
+    const eventDestination = formData.get('event-destination');
+    if (eventDestination !== this._state.destination.name) {
+      const newCity = cities.find((current) => current.name === eventDestination);
+
+      if (newCity) {
+        this.updateElement({
+          destination: newCity,
+        });
+      }
+    }
+  };
+
+  #setDatepicker = () => {
+    this.#dateStartPickerElement = this.element.querySelector('#event-start-time-1');
+    this.#dateEndPickerElement = this.element.querySelector('#event-end-time-1');
+    // Виртуальный input, для красивого отображения даты окончания точки. Без него будет мигать =(
+    this.#datePickerVirtualInput = document.createElement('input');
+
+    const dateFrom = parseDayJs(this._state.dateFrom).$d;
+    const dateTo = parseDayJs(this._state.dateTo).$d;
+
+    this.#dateStartPicker = new flatpickr(
+      this.#dateStartPickerElement,
+      {
+        mode: 'range',
+        enableTime: true,
+        'time_24hr': true,
+        dateFormat: 'd/m/y H:i',
+        defaultDate: [dateFrom, dateTo],
+        onClose: this.#dateChangeHandler,
+        ariaDateFormat: '',
+        locale: {
+          rangeSeparator: '      '
+        },
+        onChange: ([start, end]) => {
+          if (start) {
+            this.#dateStartPickerElement.value = getFormatDayJs(parseDayJs(start), 'DD/MM/YY HH:mm');
+          }
+          if (end) {
+            this.#dateEndPickerElement.value = getFormatDayJs(parseDayJs(end), 'DD/MM/YY HH:mm');
+          }
+          else {
+            this.#dateEndPickerElement.value = '--/--/-- --:--';
+          }
+        }
+      }
+    );
+    this.#dateEndPicker = new flatpickr(
+      this.#datePickerVirtualInput,
+      {
+        mode: 'range',
+        enableTime: true,
+        'time_24hr': true,
+        dateFormat: '',
+        defaultDate: [dateFrom, false],
+        minDate: dateFrom,
+        onClose: this.#dateChangeHandler,
+        ariaDateFormat: '',
+        locale: {
+          rangeSeparator: '      '
+        },
+        onChange: ([start, end]) => {
+          if (start) {
+            this.#dateStartPickerElement.value = getFormatDayJs(parseDayJs(start), 'DD/MM/YY HH:mm');
+          }
+          if (end) {
+            this.#dateEndPickerElement.value = getFormatDayJs(parseDayJs(end), 'DD/MM/YY HH:mm');
+          }
+        }
+      }
+    );
+
+    this.#dateEndPickerElement.addEventListener('click', this.#openDateEndPicker);
+  };
+
+  #openDateEndPicker = () => {
+    this.#dateEndPicker.open(false,this.#dateEndPickerElement);
+  };
+
+  #setDateByState = () => {
+    const eventStartDateTimeElement = this.element.querySelector('#event-start-time-1');
+    const eventEndDateTimeElement = this.element.querySelector('#event-end-time-1');
+    const dateFrom = getFormatDayJs(parseDayJs(this._state.dateFrom), 'DD/MM/YY HH:mm');
+    const dateTo = getFormatDayJs(parseDayJs(this._state.dateTo), 'DD/MM/YY HH:mm');
+
+    eventStartDateTimeElement.value = dateFrom;
+    eventEndDateTimeElement.value = dateTo;
+  };
+
+  #dateChangeHandler = ([start, end]) => {
+    const startDate = getFormatDayJs(parseDayJs(start).add(-3, 'hour'));
+    const endDate = getFormatDayJs(parseDayJs(end).add(-3, 'hour'));
+
+    if (startDate !== this._state.dateFrom || endDate !== this._state.dateTo) {
       this.updateElement({
-        destination: cities.find((current) => current.name === evt.target.value),
+        dateFrom: startDate,
+        dateTo: endDate,
       });
     }
   };
@@ -269,4 +381,21 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
     evt.preventDefault();
     this._callback.click();
   };
+
+  removeElement() {
+    super.removeElement();
+
+    this.#datePickerVirtualInput = null;
+    this.#dateStartPickerElement = null;
+    this.#dateEndPickerElement = null;
+
+    if (this.#dateStartPicker !== null) {
+      this.#dateStartPicker.destroy();
+      this.#dateStartPicker = null;
+    }
+    if (this.#dateEndPicker !== null) {
+      this.#dateEndPicker.destroy();
+      this.#dateEndPicker = null;
+    }
+  }
 }

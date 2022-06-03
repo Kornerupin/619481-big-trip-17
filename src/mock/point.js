@@ -125,7 +125,7 @@ const offerOffers = [
 // Стартовая дата - конец следующей рабочей недели
 let dateFrom = daysjs()
   .startOf('week')
-  .add(1, 'day');
+  .add(7, 'day');
 
 const randomDateDelay = (from) => {
   let minutesDelay = Math.floor(Math.random() * 12) * 5;
