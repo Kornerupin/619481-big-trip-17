@@ -1,10 +1,10 @@
 import TripEventsItemView from '../view/trip-events-item-view';
 import TripEventsItemEditView from '../view/trip-events-item-edit-view';
 import {render, replace, remove} from '../framework/render';
-import {PointModes} from '../const';
+import {PointModes, UpdateType, UserAction} from '../const';
 
 export default class PointPresenter {
-  #listContainer = null;
+  #boardContainer = null;
 
   #itemComponent = null;
   #itemEditComponent = null;
@@ -16,8 +16,8 @@ export default class PointPresenter {
 
   #mode = PointModes.DEFAULT;
 
-  constructor(listContainer, changeData, changeMode) {
-    this.#listContainer = listContainer;
+  constructor(boardContainer, changeData, changeMode) {
+    this.#boardContainer = boardContainer;
     this.#changeData = changeData;
     this.#changeMode = changeMode;
   }
@@ -37,7 +37,7 @@ export default class PointPresenter {
     this.#itemEditComponent.setClickHandler(this.#handlerItemEditClick);
 
     if (oldItemComponent === null || oldItemEditComponent === null) {
-      render(this.#itemComponent, this.#listContainer);
+      render(this.#itemComponent, this.#boardContainer);
       return false;
     }
 
@@ -87,7 +87,11 @@ export default class PointPresenter {
   };
 
   #handlerItemSubmit = (newData) => {
-    this.#changeData({...this.#point, ...newData});
+    this.#changeData(
+      UserAction.UPDATE_POINT,
+      {...this.#point, ...newData},
+      UpdateType.MINOR
+    );
     this.#replaceEditToItem();
   };
 
@@ -96,7 +100,11 @@ export default class PointPresenter {
   };
 
   #handlerToggleFavorite = () => {
-    this.#changeData({...this.#point, isFavorite: !this.#point.isFavorite});
+    this.#changeData(
+      UserAction.UPDATE_POINT,
+      {...this.#point, isFavorite: !this.#point.isFavorite},
+      UpdateType.PATCH
+    );
   };
 
   destroy = () => {

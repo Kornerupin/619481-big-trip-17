@@ -39,20 +39,6 @@ const getAllArrayId = (baseArr, searchArr) => searchArr
   .filter((current) => current !== -1)
   .sort();
 
-const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1)
-  ];
-};
-
 const sorts = {
   [SortModes.DAY]: (items) => items.sort((a, b) => (parseDayJs(a.dateFrom).diff(parseDayJs(b.dateFrom)))),
   [SortModes.TIME]: (items) => items.sort((a, b) => {
@@ -83,6 +69,5 @@ export {
   getFormatTime,
   parseDayJs,
   isPointExpired,
-  updateItem,
   sorts
 };

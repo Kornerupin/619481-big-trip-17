@@ -21,4 +21,16 @@ const SortModes = {
   OFFERS: 'Offers',
 };
 
-export {PointTypes, PointPrices, OfferTypes, FilterTypes, PointModes, SortModes};
+const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+  CREATE_POINT: 'CREATE_POINT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+export {PointTypes, PointPrices, OfferTypes, FilterTypes, PointModes, SortModes, UserAction, UpdateType};
