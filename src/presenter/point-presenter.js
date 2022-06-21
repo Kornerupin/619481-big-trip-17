@@ -88,9 +88,9 @@ export default class PointPresenter {
 
   #handlerItemSubmit = (newData) => {
     this.#changeData(
+      UpdateType.MINOR,
       UserAction.UPDATE_POINT,
-      {...this.#point, ...newData},
-      UpdateType.MINOR
+      {...this.#point, ...newData}
     );
     this.#replaceEditToItem();
   };
@@ -101,9 +101,9 @@ export default class PointPresenter {
 
   #handlerToggleFavorite = () => {
     this.#changeData(
+      UpdateType.PATCH,
       UserAction.UPDATE_POINT,
-      {...this.#point, isFavorite: !this.#point.isFavorite},
-      UpdateType.PATCH
+      {...this.#point, isFavorite: !this.#point.isFavorite}
     );
   };
 

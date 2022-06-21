@@ -1,10 +1,11 @@
-import TripEventsItemView from '../view/trip-events-item-view';
 import TripEventsItemEditView from '../view/trip-events-item-edit-view';
-import {render, replace, remove} from '../framework/render';
-import {PointModes, UpdateType, UserAction} from '../const';
+import {render, replace, remove, RenderPosition} from '../framework/render';
+import {BlankPoint, UpdateType, UserAction} from '../const';
 
 export default class PointNewPresenter {
   #boardContainer = null;
+
+  #pointsModel = null;
 
   #itemComponent = null;
   #itemEditComponent = null;
@@ -14,58 +15,38 @@ export default class PointNewPresenter {
   #changeData = null;
   #changeMode = null;
 
-  #mode = PointModes.DEFAULT;
-
   constructor(boardContainer, changeData, changeMode) {
     this.#boardContainer = boardContainer;
     this.#changeData = changeData;
     this.#changeMode = changeMode;
   }
 
-  init = (point) => {
+  init = (point = BlankPoint) => {
     this.#point = point;
 
-    const oldItemComponent = this.#itemComponent;
     const oldItemEditComponent = this.#itemEditComponent;
 
-    this.#itemComponent = new TripEventsItemView(this.#point);
     this.#itemEditComponent = new TripEventsItemEditView(this.#point);
 
-    this.#itemComponent.setClickHandler(this.#handlerItemClick);
-    this.#itemComponent.setToggleFavoriteHandler(this.#handlerToggleFavorite);
     this.#itemEditComponent.setFormSubmitHandler(this.#handlerItemSubmit);
-    this.#itemEditComponent.setClickHandler(this.#handlerItemEditClick);
+    this.#itemEditComponent.setCloseHandler(this.#handlerItemEditClose);
+    this.#itemEditComponent.setClickHandler(this.#handlerItemEditClose);
+    document.addEventListener('keydown', this.#onEscKeyDown);
 
-    if (oldItemComponent === null || oldItemEditComponent === null) {
-      render(this.#itemComponent, this.#boardContainer);
+    if (oldItemEditComponent === null) {
+      render(this.#itemEditComponent, this.#boardContainer, RenderPosition.AFTERBEGIN);
       return false;
     }
 
     // При повторном обращении - перерисовываем компоненты.
     // За счёт проверки наличия в DOM, всегда заменяется только один компонент (существующий в списке)
-    if (this.#mode === PointModes.DEFAULT) {
-      replace(this.#itemComponent, oldItemComponent);
-    }
-
-    if (this.#mode === PointModes.EDIT) {
-      replace(this.#itemEditComponent, oldItemEditComponent);
-    }
-
-    remove(oldItemComponent);
+    replace(this.#itemEditComponent, oldItemEditComponent);
     remove(oldItemEditComponent);
   };
 
   resetView = () => {
-    if (this.#mode === PointModes.EDIT) {
-      this.#itemEditComponent.reset(this.#point);
-      this.#replaceEditToItem();
-    }
-  };
-
-  #replaceEditToItem = () => {
-    replace(this.#itemComponent, this.#itemEditComponent);
     document.removeEventListener('keydown', this.#onEscKeyDown);
-    this.#mode = PointModes.DEFAULT;
+    this.destroy();
   };
 
   #onEscKeyDown = (evt) => {
@@ -75,36 +56,16 @@ export default class PointNewPresenter {
     }
   };
 
-  #replaceItemToEdit = () => {
-    this.#changeMode();
-    replace(this.#itemEditComponent, this.#itemComponent);
-    document.addEventListener('keydown', this.#onEscKeyDown);
-    this.#mode = PointModes.EDIT;
-  };
-
-  #handlerItemClick = () => {
-    this.#replaceItemToEdit();
-  };
-
   #handlerItemSubmit = (newData) => {
     this.#changeData(
-      UserAction.UPDATE_POINT,
-      {...this.#point, ...newData},
-      UpdateType.MINOR
+      UpdateType.MINOR,
+      UserAction.CREATE_POINT,
+      {...this.#point, ...newData}
     );
-    this.#replaceEditToItem();
   };
 
-  #handlerItemEditClick = () => {
+  #handlerItemEditClose = () => {
     this.resetView();
-  };
-
-  #handlerToggleFavorite = () => {
-    this.#changeData(
-      UserAction.UPDATE_POINT,
-      {...this.#point, isFavorite: !this.#point.isFavorite},
-      UpdateType.PATCH
-    );
   };
 
   destroy = () => {

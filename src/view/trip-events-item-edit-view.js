@@ -55,9 +55,7 @@ const createEventTypeFromTemplate = (type, checkedType, isModeAdd) => {
     </div>`;
 };
 
-const createItemEditTemplate = (point) => {
-  const isModeAdd = point === BlankPoint;
-
+const createItemEditTemplate = (point, isModeAdd) => {
   const {basePrice, destination, type, offers} = point;
 
   let events = '';
@@ -82,6 +80,21 @@ const createItemEditTemplate = (point) => {
   const destinationPictures = destination.pictures.map(
     (current) => createPictureFromTemplate(current)
   ).join();
+
+  let destinationBlock = '';
+  if (destinationDescription.length > 1) {
+    destinationBlock = `
+      <section class="event__section  event__section--destination">
+        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+        <p class="event__destination-description">${destinationDescription}</p>
+        <div class="event__photos-container">
+          <div class="event__photos-tape">
+            ${destinationPictures}
+          </div>
+        </div>
+      </section>
+    `;
+  }
 
   const eventStartTime = getFormatDayJs(parseDayJs(dateFrom), 'DD/MM/YY HH:mm');
   const eventEndTime = getFormatDayJs(parseDayJs(dateTo), 'DD/MM/YY HH:mm');
@@ -156,15 +169,7 @@ const createItemEditTemplate = (point) => {
             </div>
           </section>
 
-          <section class="event__section  event__section--destination">
-            <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${destinationDescription}</p>
-            <div class="event__photos-container">
-              <div class="event__photos-tape">
-                ${destinationPictures}
-              </div>
-            </div>
-          </section>
+          ${destinationBlock}
         </section>
       </form>
     </li>
@@ -177,15 +182,17 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
   #dateEndPicker = null;
   #dateEndPickerElement = null;
   #datePickerVirtualInput = null;
+  #isModeAdd = false;
 
   constructor(point = BlankPoint) {
     super();
     this._state = TripEventsItemEditView.parseItemToState(point);
+    this.#isModeAdd = point === BlankPoint;
     this._restoreHandlers();
   }
 
   get template() {
-    return createItemEditTemplate(this._state);
+    return createItemEditTemplate(this._state, this.#isModeAdd);
   }
 
   static parseItemToState = (item) => ({
@@ -251,10 +258,10 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
       }
     }
 
-    const eventPrice = formData.get('event-price');
-    if (eventPrice !== this._state.price) {
+    const eventPrice = parseInt(formData.get('event-price'), 10);
+    if (eventPrice !== this._state.basePrice) {
       this.updateElement({
-        basePrice: parseInt(eventPrice, 10),
+        basePrice: eventPrice,
       });
     }
   };

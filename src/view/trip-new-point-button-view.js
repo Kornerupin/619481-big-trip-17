@@ -1,18 +1,26 @@
 import AbstractView from '../framework/view/abstract-view';
 
-const createInfoTemplate = () => `
-    <button class="trip-main__event-add-btn  btn  btn--big  btn--yellow" type="button">
+const createInfoTemplate = (isDisabled) => {
+  const textDisabled = isDisabled ? ' disabled' : '';
+
+  return `
+    <button class="trip-main__event-add-btn  btn  btn--big  btn--yellow" type="button" ${textDisabled}>
       New event
     </button>
   `;
+};
 
 export default class TripNewPointButtonView extends AbstractView {
-  constructor() {
+  #isDisabled = null;
+
+  constructor(isDisabled) {
     super();
+
+    this.#isDisabled = isDisabled;
   }
 
   get template() {
-    return createInfoTemplate();
+    return createInfoTemplate(this.#isDisabled);
   }
 
   setClickHandler = (callback) => {

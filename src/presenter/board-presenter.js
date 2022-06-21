@@ -7,9 +7,9 @@ import {sorts} from '../utils';
 import {sortData} from '../mock/sort';
 import {FilterTypes, SortModes, UpdateType, UserAction} from '../const';
 import TripEventsListEmptyView from '../view/trip-events-list-empty-view';
-import {nanoid} from 'nanoid';
 import TripNewPointButtonView from '../view/trip-new-point-button-view';
 import PointNewPresenter from './point-new-presenter';
+import {nanoid} from 'nanoid';
 
 export default class BoardPresenter {
   #tripEventsContainer = null;
@@ -29,6 +29,8 @@ export default class BoardPresenter {
   #sortItems = sortData;
   #currentSortType = null;
   #filterType = FilterTypes.EVERYTHING;
+
+  #newPointButtonDisabled = false;
 
   #pointPresenter = new Map();
 
@@ -102,6 +104,9 @@ export default class BoardPresenter {
 
   #handleModeChange = () => {
     this.#pointPresenter.forEach((presenter) => presenter.resetView());
+    if (this.#pointNewPresenter) {
+      this.#pointNewPresenter.resetView();
+    }
   };
 
   #renderItem = (point) => {
@@ -174,48 +179,48 @@ export default class BoardPresenter {
   };
 
   #renderBoard = (setSortTypeByDefault = false) => {
-
     if (setSortTypeByDefault) {
       this.#currentSortType = null;
     }
 
-    this.#renderList();
-    this.#pointNewPresenter = new PointNewPresenter(this.#listComponent.element, this.#handleViewAction);
-
     if (this.points.length > 0) {
+      this.#renderSort();
+      this.#renderList();
+      this.#pointNewPresenter = new PointNewPresenter(this.#listComponent.element, this.#handleViewAction, this.#handleModeChange);
       this.#renderAddItem();
       this.#renderInfo();
-      this.#renderSort();
     }
     else {
+      this.#renderList();
+      this.#renderAddItem();
       this.#renderEmptyList();
     }
+
   };
 
-  createTask = (callback) => {
-    this.#handlerSortChange(SortModes.DAY);
+  createTask = () => {
     this.#filtersModel.setFilter(UpdateType.MAJOR, FilterTypes.EVERYTHING);
-    this.#pointNewPresenter.init(callback);
+    this.#handlerSortChange(SortModes.DAY);
+    this.#pointNewPresenter.init();
   };
 
   #renderAddItem = () => {
     if (this.#newPointButtonComponent === null) {
-      this.#newPointButtonComponent = new TripNewPointButtonView();
+      this.#newPointButtonComponent = new TripNewPointButtonView(this.#newPointButtonDisabled);
     }
     render(this.#newPointButtonComponent, this.#tripMainContainer);
     this.#newPointButtonComponent.setClickHandler(this.#handleNewPointButtonClick);
-
-    const pointPresenter = new PointPresenter(this.#listComponent.element, this.#handleViewAction, this.#handleModeChange);
-    pointPresenter.init();
-    this.#pointPresenter.set(nanoid(), pointPresenter);
   };
 
   #handleNewPointButtonClick = () => {
     this.#newPointButtonComponent.element.disabled = true;
+    this.#newPointButtonDisabled = true;
+    console.log('handleNewPointButtonClick', this.#newPointButtonComponent.element);
     this.createTask();
   };
 
   #handleNewPointFormClose = () => {
     this.#newPointButtonComponent.element.disabled = false;
+    console.log('handleNewPointFormClose', this.#newPointButtonComponent.element);
   };
 }
