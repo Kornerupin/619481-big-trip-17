@@ -1,72 +1,76 @@
 import {render, remove} from '../framework/render';
 import TripSortView from '../view/trip-sort-view';
 import TripEventsListView from '../view/trip-events-list-view';
-import TripEventsListEmpty from '../view/trip-events-list-empty';
 import TripInfoView from '../view/trip-info-view';
-import TripFiltersView from '../view/trip-filters-view';
 import PointPresenter from './point-presenter';
 import {sorts} from '../utils';
 import {sortData} from '../mock/sort';
-import {SortModes, UpdateType, UserAction} from '../const';
+import {FilterTypes, SortModes, UpdateType, UserAction} from '../const';
+import TripEventsListEmptyView from '../view/trip-events-list-empty-view';
 
 export default class BoardPresenter {
   #tripEventsContainer = null;
   #tripMainContainer = null;
-  #tripFilterContainer = null;
 
   #pointsModel = null;
-  #pointPresenter = new Map();
+  #filtersModel = null;
 
   #infoComponent = null;
-  #filterComponent = null;
-  #sortComponent = null;
-  #sortType = null;
-  #currentSortType = null;
   #listComponent = null;
-  #listEmptyComponent = null;
+  #emptyListComponent = null;
+  #sortComponent = null;
 
   #sortItems = sortData;
-  #listItems = [];
+  #currentSortType = null;
+  #filterType = FilterTypes.EVERYTHING;
 
-  constructor(tripEventsContainer, tripMainContainer, tripFilterContainer, pointsModel) {
+  #pointPresenter = new Map();
+
+  constructor(tripEventsContainer, tripMainContainer, pointsModel, filtersModel) {
     this.#tripEventsContainer = tripEventsContainer;
-    this.#tripFilterContainer = tripFilterContainer;
     this.#tripMainContainer = tripMainContainer;
     this.#pointsModel = pointsModel;
     this.#pointsModel.addObserver(this.#handleModelEvent);
+
+    this.#filtersModel = filtersModel;
+    this.#filtersModel.addObserver(this.#handleModelEvent);
   }
 
   get points() {
-    switch(this.#sortType) {
+    this.#filterType = this.#filtersModel.filter;
+    const points = this.#pointsModel.points;
+    const filteredTasks = this.#filtersModel.filters[this.#filterType].filterFunc(points);
+
+    switch(this.#currentSortType) {
       case SortModes.DAY:
-        return [this.#pointsModel.points].sort(sorts[SortModes.DAY]);
+        return sorts[SortModes.DAY](filteredTasks);
       case SortModes.EVENT:
-        return [this.#pointsModel.points].sort(sorts[SortModes.EVENT]);
+        return sorts[SortModes.EVENT](filteredTasks);
       case SortModes.TIME:
-        return [this.#pointsModel.points].sort(sorts[SortModes.TIME]);
+        return sorts[SortModes.TIME](filteredTasks);
       case SortModes.OFFERS:
-        return [this.#pointsModel.points].sort(sorts[SortModes.OFFERS]);
+        return sorts[SortModes.OFFERS](filteredTasks);
       case SortModes.PRICE:
-        return [this.#pointsModel.points].sort(sorts[SortModes.PRICE]);
+        return sorts[SortModes.PRICE](filteredTasks);
     }
 
-    return this.#pointsModel.points;
+    return filteredTasks;
   }
 
   init = () => {
     this.#renderBoard();
   };
 
-  #handleViewAction = (actionType, updateData, updateType = UpdateType.PATCH) => {
+  #handleViewAction = (updateType, actionType, updateData) => {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this.#pointsModel.updatePoint(updateData, updateType);
+        this.#pointsModel.updatePoint(updateType, updateData);
         break;
       case UserAction.DELETE_POINT:
-        this.#pointsModel.deletePoint(updateData, updateType);
+        this.#pointsModel.deletePoint(updateType, updateData);
         break;
       case UserAction.CREATE_POINT:
-        this.#pointsModel.createPoint(updateData, updateType);
+        this.#pointsModel.createPoint(updateType, updateData);
         break;
     }
   };
@@ -79,12 +83,13 @@ export default class BoardPresenter {
         break;
       // Меняем список
       case UpdateType.MINOR:
-        this.#clearList();
-        this.#renderList(true);
+        this.#clearBoard();
+        this.#renderBoard();
         break;
       // Меняем всё
       case UpdateType.MAJOR:
-        this.#renderBoard();
+        this.#clearBoard();
+        this.#renderBoard(true);
         break;
     }
   };
@@ -115,39 +120,25 @@ export default class BoardPresenter {
 
     this.#currentSortType = sortMode;
     this.#clearList();
-    this.#renderBoard();
+    this.#renderList();
   };
 
   #renderInfo = () => {
     if (this.#infoComponent === null) {
-      this.#infoComponent = new TripInfoView();
+      this.#infoComponent = new TripInfoView(this.points);
     }
     render(this.#infoComponent, this.#tripMainContainer);
   };
 
-  #renderFilter = () => {
-    render(this.#filterComponent, this.#tripFilterContainer);
-  };
-
-  #renderList = (isRerender = false) => {
-    if (isRerender) {
-      this.#listItems = [...this.#pointsModel.points];
-    }
+  #renderList = () => {
     if (this.#listComponent === null) {
       this.#listComponent = new TripEventsListView();
     }
     render(this.#listComponent, this.#tripEventsContainer);
 
-    for (const current of this.#listItems) {
+    for (const current of this.points) {
       this.#renderItem(current);
     }
-  };
-
-  #renderListEmpty = () => {
-    if (this.#listEmptyComponent === null) {
-      this.#listEmptyComponent = new TripEventsListEmpty();
-    }
-    render(this.#listEmptyComponent, this.#tripEventsContainer);
   };
 
   #clearList = () => {
@@ -155,30 +146,40 @@ export default class BoardPresenter {
     this.#pointPresenter.clear();
   };
 
+  #renderEmptyList = () => {
+    if (this.#emptyListComponent === null) {
+      this.#emptyListComponent = new TripEventsListEmptyView(this.#filterType);
+    }
+
+    render(this.#emptyListComponent, this.#listComponent.element);
+  };
+
   #clearBoard = () => {
     this.#clearList();
 
-    remove(this.#listEmptyComponent);
     remove(this.#listComponent);
     remove(this.#infoComponent);
-    remove(this.#filterComponent);
     remove(this.#sortComponent);
+
+    if (this.#emptyListComponent) {
+      remove(this.#emptyListComponent);
+    }
   };
 
-  #renderBoard = () => {
-    this.#listItems = [...this.#pointsModel.points];
-    this.#infoComponent = new TripInfoView(this.#listItems);
-    this.#filterComponent = new TripFiltersView(this.#listItems);
+  #renderBoard = (setSortTypeByDefault = false) => {
 
-    if (this.#listItems.length === 0) {
-      this.#renderListEmpty();
+    if (setSortTypeByDefault) {
+      this.#currentSortType = null;
+    }
+
+    this.#renderList();
+
+    if (this.points.length > 0) {
+      this.#renderInfo();
+      this.#renderSort();
     }
     else {
-      this.#renderInfo();
-      this.#renderFilter();
-      this.#renderSort();
-
-      this.#renderList();
+      this.#renderEmptyList();
     }
   };
 }

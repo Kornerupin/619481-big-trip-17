@@ -269,6 +269,13 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
         });
       }
     }
+
+    const eventPrice = formData.get('event-price');
+    if (eventPrice !== this._state.price) {
+      this.updateElement({
+        basePrice: parseInt(eventPrice, 10),
+      });
+    }
   };
 
   #setDatepicker = () => {

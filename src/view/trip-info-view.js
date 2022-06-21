@@ -2,11 +2,25 @@ import AbstractView from '../framework/view/abstract-view';
 import {getFormatDayJs, parseDayJs} from '../utils';
 
 const createInfoTemplate = (points) => {
-  const cities =
+  let temp = '';
+  let cities =
     points
       .map((current) => current.destination.name)
-      .filter((current, i, arr) => arr.indexOf(current) === i)
-      .join(' — ');
+      .map((current) => {
+        if (temp !== current) {
+          temp = current;
+          return current;
+        }
+        return -1;
+      })
+      .filter((current) => current !== -1);
+
+  if (cities.length > 3) {
+    cities = `${cities[0]} — ... — ${cities[cities.length -1]}`;
+  }
+  else {
+    cities = cities.join(' — ');
+  }
 
   const dateStart = parseDayJs(points[0].dateFrom);
   const dateTo = parseDayJs(points[points.length - 1].dateTo);

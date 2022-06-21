@@ -3,13 +3,13 @@ import Observable from '../framework/observable';
 import {UpdateType} from '../const';
 
 export default class PointsModel extends Observable{
-  #points = Array.from({length: 18}, getPoint);
+  #points = Array.from({length: 5}, getPoint);
 
   get points() {
     return this.#points;
   }
 
-  updatePoint = (updatePoint, updateType = UpdateType.PATCH) => {
+  updatePoint = (updateType, updatePoint) => {
     const index = this.points.findIndex((item) => item.id === updatePoint.id);
 
     if (index === -1) {
@@ -25,7 +25,7 @@ export default class PointsModel extends Observable{
     this._notify(updateType, updatePoint);
   };
 
-  createPoint = (newPoint, updateType = UpdateType.PATCH) => {
+  createPoint = (updateType, newPoint) => {
     this.#points = [
       ...this.#points,
       newPoint
@@ -34,7 +34,7 @@ export default class PointsModel extends Observable{
     this._notify(updateType, newPoint);
   };
 
-  deletePoint = (deletePoint, updateType = UpdateType.PATCH) => {
+  deletePoint = (updateType, deletePoint) => {
     const index = this.#points.findIndex((current) => current.id === deletePoint.id);
 
     if (index === -1) {

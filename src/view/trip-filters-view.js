@@ -1,8 +1,8 @@
 import AbstractView from '../framework/view/abstract-view';
 import {FilterTypes} from '../const';
 
-const createFilterTemplate = (type) => {
-  const textChecked = type === 'EVERYTHING' ? 'checked' : '';
+const createFilterTemplate = (type, activeType) => {
+  const textChecked = type.toLowerCase() === activeType.toLowerCase() ? 'checked' : '';
 
   return `
     <div class="trip-filters__filter">
@@ -11,30 +11,47 @@ const createFilterTemplate = (type) => {
     </div>`;
 };
 
-const createFiltersFormTemplate = () => {
-  let filters = '';
+const createFiltersFormTemplate = (filters, activeType) => {
+  let filtersTemplate = '';
 
-  for (const current in FilterTypes) {
-    filters += createFilterTemplate(current);
+  for (const current in filters) {
+    filtersTemplate += createFilterTemplate(current, activeType);
   }
 
   return `
     <form class="trip-filters" action="#" method="get">
-      ${filters}
+      ${filtersTemplate}
 
       <button class="visually-hidden" type="submit">Accept filter</button>
     </form>`;
 };
 
 export default class TripFiltersView extends AbstractView {
-  #points = null;
+  #filters = null;
+  #currentFilterType = null;
 
-  constructor(points) {
+  constructor(currentFilterType) {
     super();
-    this.#points = points;
+    this.#filters = FilterTypes;
+    this.#currentFilterType = currentFilterType;
   }
 
   get template() {
-    return createFiltersFormTemplate(this.#points);
+    return createFiltersFormTemplate(this.#filters, this.#currentFilterType);
   }
+
+  setChangeHandler = (callback) => {
+    this._callback.change = callback;
+
+    this.element.addEventListener('change', this.#changeHandler);
+  };
+
+  #changeHandler = (evt) => {
+    evt.preventDefault();
+
+    let val = evt.target.value.toLowerCase();
+    val = val[0].toUpperCase() + val.slice(1);
+
+    this._callback.change(val);
+  };
 }
