@@ -35,6 +35,7 @@ export default class PointPresenter {
     this.#itemComponent.setToggleFavoriteHandler(this.#handlerToggleFavorite);
     this.#itemEditComponent.setFormSubmitHandler(this.#handlerItemSubmit);
     this.#itemEditComponent.setClickHandler(this.#handlerItemEditClick);
+    this.#itemEditComponent.setDeleteHandler(this.#handlerItemDelete);
 
     if (oldItemComponent === null || oldItemEditComponent === null) {
       render(this.#itemComponent, this.#boardContainer);
@@ -93,6 +94,14 @@ export default class PointPresenter {
       {...this.#point, ...newData}
     );
     this.#replaceEditToItem();
+  };
+
+  #handlerItemDelete = () => {
+    this.#changeData(
+      UpdateType.MINOR,
+      UserAction.DELETE_POINT,
+      {...this.#point}
+    );
   };
 
   #handlerItemEditClick = () => {
