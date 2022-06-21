@@ -9,7 +9,6 @@ import {FilterTypes, SortModes, UpdateType, UserAction} from '../const';
 import TripEventsListEmptyView from '../view/trip-events-list-empty-view';
 import TripNewPointButtonView from '../view/trip-new-point-button-view';
 import PointNewPresenter from './point-new-presenter';
-import {nanoid} from 'nanoid';
 
 export default class BoardPresenter {
   #tripEventsContainer = null;
@@ -215,12 +214,10 @@ export default class BoardPresenter {
   #handleNewPointButtonClick = () => {
     this.#newPointButtonComponent.element.disabled = true;
     this.#newPointButtonDisabled = true;
-    console.log('handleNewPointButtonClick', this.#newPointButtonComponent.element);
     this.createTask();
   };
 
   #handleNewPointFormClose = () => {
     this.#newPointButtonComponent.element.disabled = false;
-    console.log('handleNewPointFormClose', this.#newPointButtonComponent.element);
   };
 }

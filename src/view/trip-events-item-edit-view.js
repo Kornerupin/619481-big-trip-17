@@ -82,7 +82,7 @@ const createItemEditTemplate = (point, isModeAdd) => {
   ).join();
 
   let destinationBlock = '';
-  if (destinationDescription.length > 1) {
+  if (destinationDescription.length > 1 || destinationPictures.length > 1) {
     destinationBlock = `
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
