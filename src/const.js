@@ -13,6 +13,22 @@ const PointModes = {
   EDIT: 'EDIT',
 };
 
+const BlankPoint = {
+  basePrice: 0,
+  dateFrom: false,
+  dateTo: false,
+  destination: {
+    'description': '',
+    'name': '',
+    'pictures': []
+  },
+  type: PointTypes[0],
+  offers: {
+    type: PointTypes[0],
+    data: []
+  },
+};
+
 const SortModes = {
   DAY: 'Day',
   EVENT: 'Event',
@@ -33,4 +49,4 @@ const UpdateType = {
   MAJOR: 'MAJOR',
 };
 
-export {PointTypes, PointPrices, OfferTypes, FilterTypes, PointModes, SortModes, UserAction, UpdateType};
+export {PointTypes, PointPrices, OfferTypes, FilterTypes, PointModes, SortModes, UserAction, UpdateType, BlankPoint};

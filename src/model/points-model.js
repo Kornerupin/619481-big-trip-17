@@ -1,6 +1,5 @@
 import {getPoint} from '../mock/point';
 import Observable from '../framework/observable';
-import {UpdateType} from '../const';
 
 export default class PointsModel extends Observable{
   #points = Array.from({length: 5}, getPoint);

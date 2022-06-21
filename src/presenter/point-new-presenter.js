@@ -1,9 +1,9 @@
 import TripEventsItemView from '../view/trip-events-item-view';
 import TripEventsItemEditView from '../view/trip-events-item-edit-view';
 import {render, replace, remove} from '../framework/render';
-import {BlankPoint, PointModes, UpdateType, UserAction} from '../const';
+import {PointModes, UpdateType, UserAction} from '../const';
 
-export default class PointPresenter {
+export default class PointNewPresenter {
   #boardContainer = null;
 
   #itemComponent = null;
@@ -22,7 +22,7 @@ export default class PointPresenter {
     this.#changeMode = changeMode;
   }
 
-  init = (point = BlankPoint) => {
+  init = (point) => {
     this.#point = point;
 
     const oldItemComponent = this.#itemComponent;

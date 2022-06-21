@@ -1,30 +1,11 @@
 import {getFormatDayJs, parseDayJs} from '../utils';
-import {PointTypes} from '../const';
+import {BlankPoint, PointTypes} from '../const';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import cloneDeep from 'clone-deep';
 import {cities, getOffer} from '../mock/point';
 import flatpickr from 'flatpickr';
 
 import 'flatpickr/dist/flatpickr.min.css';
-
-const BLANK_POINT = {
-  basePrice: 0,
-  destination: {
-    'description': '',
-    'name': '',
-    'pictures': [
-      {
-        'src': '',
-        'description': ''
-      }
-    ]
-  },
-  type: PointTypes[0],
-  offers: {
-    type: PointTypes[0],
-    data: []
-  },
-};
 
 const createOfferFromTemplate = (data) => {
   const {offerId, title, price, isChecked} = data;
@@ -75,7 +56,7 @@ const createEventTypeFromTemplate = (type, checkedType, isModeAdd) => {
 };
 
 const createItemEditTemplate = (point) => {
-  const isModeAdd = point === BLANK_POINT;
+  const isModeAdd = point === BlankPoint;
 
   const {basePrice, destination, type, offers} = point;
 
@@ -197,7 +178,7 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
   #dateEndPickerElement = null;
   #datePickerVirtualInput = null;
 
-  constructor(point = BLANK_POINT) {
+  constructor(point = BlankPoint) {
     super();
     this._state = TripEventsItemEditView.parseItemToState(point);
     this._restoreHandlers();
@@ -387,6 +368,30 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
   #clickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
+  };
+
+  setDeleteHandler = (callback) => {
+    this._callback.delete = callback;
+
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteHandler);
+  };
+
+  #deleteHandler = (evt) => {
+    evt.preventDefault();
+
+    this._callback.delete();
+  };
+
+  setCloseHandler = (callback) => {
+    this._callback.close = callback;
+
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#closeHandler);
+  };
+
+  #closeHandler = (evt) => {
+    evt.preventDefault();
+
+    this._callback.close();
   };
 
   removeElement() {

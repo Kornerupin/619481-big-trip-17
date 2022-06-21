@@ -7,6 +7,9 @@ import {sorts} from '../utils';
 import {sortData} from '../mock/sort';
 import {FilterTypes, SortModes, UpdateType, UserAction} from '../const';
 import TripEventsListEmptyView from '../view/trip-events-list-empty-view';
+import {nanoid} from 'nanoid';
+import TripNewPointButtonView from '../view/trip-new-point-button-view';
+import PointNewPresenter from './point-new-presenter';
 
 export default class BoardPresenter {
   #tripEventsContainer = null;
@@ -14,6 +17,9 @@ export default class BoardPresenter {
 
   #pointsModel = null;
   #filtersModel = null;
+
+  #pointNewPresenter = null;
+  #newPointButtonComponent = null;
 
   #infoComponent = null;
   #listComponent = null;
@@ -160,6 +166,7 @@ export default class BoardPresenter {
     remove(this.#listComponent);
     remove(this.#infoComponent);
     remove(this.#sortComponent);
+    remove(this.#newPointButtonComponent);
 
     if (this.#emptyListComponent) {
       remove(this.#emptyListComponent);
@@ -173,13 +180,42 @@ export default class BoardPresenter {
     }
 
     this.#renderList();
+    this.#pointNewPresenter = new PointNewPresenter(this.#listComponent.element, this.#handleViewAction);
 
     if (this.points.length > 0) {
+      this.#renderAddItem();
       this.#renderInfo();
       this.#renderSort();
     }
     else {
       this.#renderEmptyList();
     }
+  };
+
+  createTask = (callback) => {
+    this.#handlerSortChange(SortModes.DAY);
+    this.#filtersModel.setFilter(UpdateType.MAJOR, FilterTypes.EVERYTHING);
+    this.#pointNewPresenter.init(callback);
+  };
+
+  #renderAddItem = () => {
+    if (this.#newPointButtonComponent === null) {
+      this.#newPointButtonComponent = new TripNewPointButtonView();
+    }
+    render(this.#newPointButtonComponent, this.#tripMainContainer);
+    this.#newPointButtonComponent.setClickHandler(this.#handleNewPointButtonClick);
+
+    const pointPresenter = new PointPresenter(this.#listComponent.element, this.#handleViewAction, this.#handleModeChange);
+    pointPresenter.init();
+    this.#pointPresenter.set(nanoid(), pointPresenter);
+  };
+
+  #handleNewPointButtonClick = () => {
+    this.#newPointButtonComponent.element.disabled = true;
+    this.createTask();
+  };
+
+  #handleNewPointFormClose = () => {
+    this.#newPointButtonComponent.element.disabled = false;
   };
 }
