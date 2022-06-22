@@ -242,6 +242,7 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setClickHandler(this._callback.click);
     this.setCloseHandler(this._callback.close);
+    this.setDeleteHandler(this._callback.delete);
     this.#setDatepicker();
     this.#setDateByState();
   };

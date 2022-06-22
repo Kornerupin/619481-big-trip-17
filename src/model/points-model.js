@@ -69,7 +69,6 @@ export default class PointsModel extends Observable{
       throw new Error('Can\'t update unexisting point!');
     }
 
-    this._notify(updateType, updatePoint);
     try {
       const response = await this.#pointsApiService.updatePoint(updatePoint);
       const updatedPoint = this.#adaptToClient(response);
@@ -101,13 +100,6 @@ export default class PointsModel extends Observable{
     if (index === -1) {
       throw new Error('Can\'t delete unexisting point!');
     }
-
-    this.#points = [
-      ...this.#points.slice(0, index),
-      ...this.#points.slice(index + 1)
-    ];
-
-    this._notify(updateType, deletePoint);
 
     try {
       // Обратите внимание, метод удаления задачи на сервере

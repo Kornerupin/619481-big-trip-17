@@ -81,6 +81,8 @@ export default class BoardPresenter {
   #handleViewAction = async (updateType, actionType, updateData) => {
     this.#uiBlocker.block();
 
+    const test = this.#pointPresenter.get(updateData.id);
+
     switch (actionType) {
       case UserAction.UPDATE_POINT:
         this.#pointPresenter.get(updateData.id).setSaving();
@@ -91,11 +93,12 @@ export default class BoardPresenter {
         }
         break;
       case UserAction.DELETE_POINT:
-        this.#pointPresenter.get(updateData.id).setDeleting();
+        console.log(test);
+        test.setDeleting();
         try {
           await this.#pointsModel.deletePoint(updateType, updateData);
         } catch(err) {
-          this.#pointPresenter.get(updateData.id).setAborting();
+          test.setAborting();
         }
         break;
       case UserAction.CREATE_POINT:
