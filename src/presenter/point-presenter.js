@@ -37,6 +37,7 @@ export default class PointPresenter {
     this.#itemComponent.setToggleFavoriteHandler(this.#handlerToggleFavorite);
     this.#itemEditComponent.setFormSubmitHandler(this.#handlerItemSubmit);
     this.#itemEditComponent.setClickHandler(this.#handlerItemEditClick);
+    this.#itemEditComponent.setCloseHandler(this.#handlerItemEditClick);
     this.#itemEditComponent.setDeleteHandler(this.#handlerItemDelete);
 
     if (oldItemComponent === null || oldItemEditComponent === null) {
@@ -51,8 +52,7 @@ export default class PointPresenter {
     }
 
     if (this.#mode === PointModes.EDIT) {
-      replace(this.#itemComponent, oldItemEditComponent);
-      this.#mode = PointModes.DEFAULT;
+      replace(this.#itemEditComponent, oldItemEditComponent);
     }
 
     remove(oldItemComponent);
@@ -61,6 +61,7 @@ export default class PointPresenter {
 
   setSaving = () => {
     if (this.#mode === PointModes.EDIT) {
+      console.log('saving - yep');
       this.#itemEditComponent.updateElement({
         isDisabled: true,
         isSaving: true,
@@ -70,6 +71,7 @@ export default class PointPresenter {
 
   setDeleting = () => {
     if (this.#mode === PointModes.EDIT) {
+      console.log('deleting - yep');
       this.#itemEditComponent.updateElement({
         isDisabled: true,
         isDeleting: true,
@@ -78,6 +80,7 @@ export default class PointPresenter {
   };
 
   setAborting = () => {
+    console.log(this.#mode);
     if (this.#mode === PointModes.DEFAULT) {
       this.#itemComponent.shake();
       return;
@@ -95,10 +98,10 @@ export default class PointPresenter {
   };
 
   resetView = () => {
-    if (this.#mode === PointModes.EDIT) {
-      this.#itemEditComponent.reset(this.#point);
-      this.#replaceEditToItem();
-    }
+    // if (this.#mode === PointModes.EDIT) {
+    //   this.#itemEditComponent.reset(this.#point);
+    //   this.#replaceEditToItem();
+    // }
   };
 
   #replaceEditToItem = () => {
@@ -118,7 +121,7 @@ export default class PointPresenter {
     this.#changeMode();
     replace(this.#itemEditComponent, this.#itemComponent);
     document.addEventListener('keydown', this.#onEscKeyDown);
-    // this.#mode = PointModes.EDIT;
+    this.#mode = PointModes.EDIT;
   };
 
   #handlerItemClick = () => {
