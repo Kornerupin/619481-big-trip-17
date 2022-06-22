@@ -15,7 +15,7 @@ const PointModes = {
 
 const BlankPoint = {
   basePrice: 0,
-  dateFrom: false,
+  dateFrom: true,
   dateTo: false,
   destination: {
     'description': '',
@@ -23,10 +23,7 @@ const BlankPoint = {
     'pictures': []
   },
   type: PointTypes[0],
-  offers: {
-    type: PointTypes[0],
-    data: []
-  },
+  offers: [],
 };
 
 const SortModes = {
@@ -47,6 +44,7 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 export {PointTypes, PointPrices, OfferTypes, FilterTypes, PointModes, SortModes, UserAction, UpdateType, BlankPoint};

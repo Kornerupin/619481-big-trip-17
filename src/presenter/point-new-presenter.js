@@ -5,20 +5,20 @@ import {BlankPoint, UpdateType, UserAction} from '../const';
 export default class PointNewPresenter {
   #boardContainer = null;
 
-  #pointsModel = null;
-
   #itemComponent = null;
   #itemEditComponent = null;
 
   #point = null;
+  #pointsModel = null;
 
   #changeData = null;
   #changeMode = null;
 
-  constructor(boardContainer, changeData, changeMode) {
+  constructor(boardContainer, changeData, changeMode, pointsModel) {
     this.#boardContainer = boardContainer;
     this.#changeData = changeData;
     this.#changeMode = changeMode;
+    this.#pointsModel = pointsModel;
   }
 
   init = (point = BlankPoint) => {
@@ -26,7 +26,7 @@ export default class PointNewPresenter {
 
     const oldItemEditComponent = this.#itemEditComponent;
 
-    this.#itemEditComponent = new TripEventsItemEditView(this.#point);
+    this.#itemEditComponent = new TripEventsItemEditView(this.#point, this.#pointsModel);
 
     this.#itemEditComponent.setFormSubmitHandler(this.#handlerItemSubmit);
     this.#itemEditComponent.setCloseHandler(this.#handlerItemEditClose);
