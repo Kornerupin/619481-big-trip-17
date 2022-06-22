@@ -51,11 +51,47 @@ export default class PointPresenter {
     }
 
     if (this.#mode === PointModes.EDIT) {
-      replace(this.#itemEditComponent, oldItemEditComponent);
+      replace(this.#itemComponent, oldItemEditComponent);
+      this.#mode = PointModes.DEFAULT;
     }
 
     remove(oldItemComponent);
     remove(oldItemEditComponent);
+  };
+
+  setSaving = () => {
+    if (this.#mode === PointModes.EDIT) {
+      this.#itemEditComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  };
+
+  setDeleting = () => {
+    if (this.#mode === PointModes.EDIT) {
+      this.#itemEditComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  };
+
+  setAborting = () => {
+    if (this.#mode === PointModes.DEFAULT) {
+      this.#itemComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#itemEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#itemEditComponent.shake(resetFormState);
   };
 
   resetView = () => {
@@ -82,7 +118,7 @@ export default class PointPresenter {
     this.#changeMode();
     replace(this.#itemEditComponent, this.#itemComponent);
     document.addEventListener('keydown', this.#onEscKeyDown);
-    this.#mode = PointModes.EDIT;
+    // this.#mode = PointModes.EDIT;
   };
 
   #handlerItemClick = () => {
@@ -95,7 +131,7 @@ export default class PointPresenter {
       UserAction.UPDATE_POINT,
       {...this.#point, ...newData}
     );
-    this.#replaceEditToItem();
+    // this.#replaceEditToItem();
   };
 
   #handlerItemDelete = () => {

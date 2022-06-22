@@ -52,6 +52,25 @@ export default class PointNewPresenter {
     this.destroy();
   };
 
+  setSaving = () => {
+    this.#itemEditComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  };
+
+  setAborting = () => {
+    const resetFormState = () => {
+      this.#itemEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#itemEditComponent.shake(resetFormState);
+  };
+
   #onEscKeyDown = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();

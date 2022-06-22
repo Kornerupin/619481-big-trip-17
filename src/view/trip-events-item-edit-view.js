@@ -6,13 +6,14 @@ import flatpickr from 'flatpickr';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
-const createOfferFromTemplate = (data, isChecked) => {
+const createOfferFromTemplate = (data, isChecked, isDisabled) => {
   const {id, title, price} = data;
-  const checkedText = isChecked ? 'checked' : '';
+  const checkedText = isChecked ? 'checked ' : '';
+  const disabledText = isDisabled ? 'disabled ' : '';
 
   return `
     <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}" type="checkbox" name="event-offer-${id}" ${checkedText}>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}" type="checkbox" name="event-offer-${id}" ${checkedText} ${disabledText}>
       <label class="event__offer-label" for="event-offer-${id}">
         <span class="event__offer-title">${title}</span>
         &plus;&euro;&nbsp;
@@ -28,13 +29,14 @@ const createPictureFromTemplate = (data) => {
   return `<img class="event__photo" src="${src}" alt="${description}">`;
 };
 
-const createEventTypeFromTemplate = (type, checkedType, isModeAdd) => {
+const createEventTypeFromTemplate = (type, checkedType, isModeAdd, isDisabled) => {
   if (PointTypes.indexOf(type) === -1) {
     return false;
   }
 
-  const textChecked = type === checkedType ? 'checked' : '';
+  const textChecked = type === checkedType ? ' checked' : '';
   const textAdd = isModeAdd ? 1 : 0;
+  const textDisabled = isDisabled ? ' disabled ' : '';
 
   return `
     <div class="event__type-item">
@@ -45,6 +47,7 @@ const createEventTypeFromTemplate = (type, checkedType, isModeAdd) => {
         name="event-type"
         value="${type}"
         ${textChecked}
+        ${textDisabled}
       >
       <label
         class="event__type-label  event__type-label--${type}"
@@ -55,11 +58,19 @@ const createEventTypeFromTemplate = (type, checkedType, isModeAdd) => {
 };
 
 const createItemEditTemplate = (point, isModeAdd, pointsModel) => {
-  const {basePrice, destination, type, offers} = point;
+  const {
+    basePrice,
+    destination,
+    type,
+    offers,
+    isDisabled,
+    isSaving,
+    isDeleting,
+  } = point;
 
   let events = '';
   for (const current of PointTypes) {
-    events+= createEventTypeFromTemplate(current, type, isModeAdd);
+    events+= createEventTypeFromTemplate(current, type, isModeAdd, isDisabled);
   }
 
   const dateFrom = point?.dateFrom ? parseDayJs(point.dateFrom) : parseDayJs(new Date());
@@ -72,7 +83,7 @@ const createItemEditTemplate = (point, isModeAdd, pointsModel) => {
     .offers;
 
   for (const current of currentTypeOffers) {
-    offersNodes += createOfferFromTemplate(current, offers.includes(current.id));
+    offersNodes += createOfferFromTemplate(current, offers.includes(current.id), isDisabled);
   }
   if (!offersNodes) {
     offersNodes = 'No offers';
@@ -103,10 +114,14 @@ const createItemEditTemplate = (point, isModeAdd, pointsModel) => {
   const eventStartTime = getFormatDayJs(parseDayJs(dateFrom), 'DD/MM/YY HH:mm');
   const eventEndTime = getFormatDayJs(parseDayJs(dateTo), 'DD/MM/YY HH:mm');
 
+  const addText = isModeAdd ? 1 : 0;
+
+  const disabledText = isDisabled ? ' disabled ' : '';
+  const saveText = isSaving ? 'Saving...' : 'Save';
+  const deleteText = isDeleting ? 'Deleting...' : 'Delete';
   const modeText = isModeAdd
     ? 'Cansel'
-    : 'Delete';
-  const addText = isModeAdd ? 1 : 0;
+    : deleteText;
 
   return `
     <li class="trip-events__item">
@@ -117,7 +132,7 @@ const createItemEditTemplate = (point, isModeAdd, pointsModel) => {
               <span class="visually-hidden">Choose event type</span>
               <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
             </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${addText}" type="checkbox">
+            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${addText}" type="checkbox" ${disabledText}>
 
             <div class="event__type-list">
               <fieldset class="event__type-group">
@@ -132,7 +147,7 @@ const createItemEditTemplate = (point, isModeAdd, pointsModel) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${cityName}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${cityName}" list="destination-list-1" ${disabledText}>
             <datalist id="destination-list-1">
               <option value="Amsterdam"></option>
               <option value="Geneva"></option>
@@ -143,11 +158,11 @@ const createItemEditTemplate = (point, isModeAdd, pointsModel) => {
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
             <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time"
-                style="text-align: left;padding-left: 5px;box-sizing: border-box;" value="${eventStartTime}">
+                style="text-align: left;padding-left: 5px;box-sizing: border-box;" value="${eventStartTime}" ${disabledText}>
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
             <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time"
-                style="cursor: pointer" readonly value="${eventEndTime}">
+                style="cursor: pointer" readonly value="${eventEndTime}" ${disabledText}>
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -155,10 +170,10 @@ const createItemEditTemplate = (point, isModeAdd, pointsModel) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" ${disabledText}>
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+          <button class="event__save-btn  btn  btn--blue" type="submit">${saveText}</button>
           <button class="event__reset-btn" type="reset">${modeText}</button>
           <button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Open event</span>
@@ -205,16 +220,28 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
   static parseItemToState = (item) => ({
     ...cloneDeep(item),
     // totalPrice: item.basePrice + item.offers.data.reduce((sum, currentOffer) => (sum += currentOffer.price), 0),
+    isDisabled: false,
+    isSaving: false,
+    isDeleting: false,
   });
 
-  static parseStateToTask = (state) => ({
-    ...cloneDeep(state)
-  });
+  static parseStateToTask = (state) => {
+    const point = {
+      ...cloneDeep(state)
+    };
+
+    delete point['isDisabled'];
+    delete point['isSaving'];
+    delete point['isDeleting'];
+
+    return point;
+  };
 
   _restoreHandlers = () => {
     this.#setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setClickHandler(this._callback.click);
+    this.setCloseHandler(this._callback.close);
     this.#setDatepicker();
     this.#setDateByState();
   };
