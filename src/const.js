@@ -15,7 +15,7 @@ const PointModes = {
 
 const BlankPoint = {
   basePrice: 0,
-  dateFrom: true,
+  dateFrom: false,
   dateTo: false,
   destination: {
     'description': '',
@@ -24,6 +24,7 @@ const BlankPoint = {
   },
   type: PointTypes[0],
   offers: [],
+  isFavorite: false,
 };
 
 const SortModes = {

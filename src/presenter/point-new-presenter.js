@@ -1,11 +1,12 @@
 import TripEventsItemEditView from '../view/trip-events-item-edit-view';
 import {render, replace, remove, RenderPosition} from '../framework/render';
 import {BlankPoint, UpdateType, UserAction} from '../const';
+import {getFormatDayJs} from '../utils';
+import daysjs from 'dayjs';
 
 export default class PointNewPresenter {
   #boardContainer = null;
 
-  #itemComponent = null;
   #itemEditComponent = null;
 
   #point = null;
@@ -22,6 +23,8 @@ export default class PointNewPresenter {
   }
 
   init = (point = BlankPoint) => {
+    point.dateFrom = getFormatDayJs(daysjs());
+    point.dateTo = getFormatDayJs(daysjs());
     this.#point = point;
 
     const oldItemEditComponent = this.#itemEditComponent;
@@ -69,7 +72,6 @@ export default class PointNewPresenter {
   };
 
   destroy = () => {
-    remove(this.#itemComponent);
     remove(this.#itemEditComponent);
   };
 }

@@ -120,7 +120,7 @@ export default class BoardPresenter {
     if (this.#loadingComponent === null) {
       this.#loadingComponent = new LoadingView();
     }
-    render(this.#loadingComponent, this.#tripEventsContainer, RenderPosition.AFTERBEGIN)
+    render(this.#loadingComponent, this.#tripEventsContainer, RenderPosition.AFTERBEGIN);
   };
 
   #renderItem = (point) => {
@@ -155,11 +155,17 @@ export default class BoardPresenter {
     render(this.#infoComponent, this.#tripMainContainer);
   };
 
-  #renderList = () => {
+  #renderListContainer = () => {
     if (this.#listComponent === null) {
       this.#listComponent = new TripEventsListView();
     }
     render(this.#listComponent, this.#tripEventsContainer);
+  };
+
+  #renderList = () => {
+    for (const current of this.points) {
+      this.#renderItem(current);
+    }
   };
 
   #clearList = () => {
@@ -200,17 +206,14 @@ export default class BoardPresenter {
 
     if (this.points.length > 0) {
       this.#renderSort();
-      this.#renderList();
+      this.#renderListContainer();
       this.#pointNewPresenter = new PointNewPresenter(this.#listComponent.element, this.#handleViewAction, this.#handleModeChange, this.#pointsModel);
       this.#renderAddItem();
       this.#renderInfo();
-
-      for (const current of this.points) {
-        this.#renderItem(current);
-      }
+      this.#renderList();
     }
     else {
-      this.#renderList();
+      this.#renderListContainer();
       this.#renderAddItem();
       this.#renderEmptyList();
     }

@@ -62,32 +62,40 @@ export default class PointsModel extends Observable{
     this._notify(UpdateType.INIT);
   };
 
-  updatePoint = (updateType, updatePoint) => {
+  updatePoint = async (updateType, updatePoint) => {
     const index = this.points.findIndex((item) => item.id === updatePoint.id);
 
     if (index === -1) {
       throw new Error('Can\'t update unexisting point!');
     }
 
-    this.#points = [
-      ...this.#points.slice(0, index),
-      updatePoint,
-      ...this.#points.slice(index + 1)
-    ];
-
     this._notify(updateType, updatePoint);
+    try {
+      const response = await this.#pointsApiService.updatePoint(updatePoint);
+      const updatedPoint = this.#adaptToClient(response);
+      this.#points = [
+        ...this.#points.slice(0, index),
+        updatedPoint,
+        ...this.#points.slice(index + 1),
+      ];
+      this._notify(updateType, updatedPoint);
+    } catch(err) {
+      throw new Error('Can\'t update point');
+    }
   };
 
-  createPoint = (updateType, newPoint) => {
-    this.#points = [
-      ...this.#points,
-      newPoint
-    ];
-
-    this._notify(updateType, newPoint);
+  createPoint = async (updateType, addPoint) => {
+    try {
+      const response = await this.#pointsApiService.addPoint(addPoint);
+      const newPoint = this.#adaptToClient(response);
+      this.#points = [newPoint, ...this.#points];
+      this._notify(updateType, newPoint);
+    } catch(err) {
+      throw new Error('Can\'t add task');
+    }
   };
 
-  deletePoint = (updateType, deletePoint) => {
+  deletePoint = async (updateType, deletePoint) => {
     const index = this.#points.findIndex((current) => current.id === deletePoint.id);
 
     if (index === -1) {
@@ -100,5 +108,19 @@ export default class PointsModel extends Observable{
     ];
 
     this._notify(updateType, deletePoint);
+
+    try {
+      // Обратите внимание, метод удаления задачи на сервере
+      // ничего не возвращает. Это и верно,
+      // ведь что можно вернуть при удалении задачи?
+      await this.#pointsApiService.deletePoint(deletePoint);
+      this.#points = [
+        ...this.#points.slice(0, index),
+        ...this.#points.slice(index + 1),
+      ];
+      this._notify(updateType, deletePoint);
+    } catch(err) {
+      throw new Error('Can\'t delete task');
+    }
   };
 }
