@@ -61,7 +61,6 @@ export default class PointPresenter {
 
   setSaving = () => {
     if (this.#mode === PointModes.EDIT) {
-      console.log('saving - yep');
       this.#itemEditComponent.updateElement({
         isDisabled: true,
         isSaving: true,
@@ -71,7 +70,6 @@ export default class PointPresenter {
 
   setDeleting = () => {
     if (this.#mode === PointModes.EDIT) {
-      console.log('deleting - yep');
       this.#itemEditComponent.updateElement({
         isDisabled: true,
         isDeleting: true,
@@ -80,7 +78,6 @@ export default class PointPresenter {
   };
 
   setAborting = () => {
-    console.log(this.#mode);
     if (this.#mode === PointModes.DEFAULT) {
       this.#itemComponent.shake();
       return;

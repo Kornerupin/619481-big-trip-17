@@ -93,7 +93,6 @@ export default class BoardPresenter {
         }
         break;
       case UserAction.DELETE_POINT:
-        console.log(test);
         test.setDeleting();
         try {
           await this.#pointsModel.deletePoint(updateType, updateData);
