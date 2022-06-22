@@ -11,7 +11,7 @@ const createOfferItemFromTemplate = (title, price) => `
     </li>
   `;
 
-const createTemplate = (point) => {
+const createTemplate = (point, pointsModel) => {
   const {type, basePrice, isFavorite, offers, destination} = point;
   const dateFrom = dayjs(point.dateFrom);
   const dateTo = dayjs(point.dateTo);
@@ -19,8 +19,12 @@ const createTemplate = (point) => {
   let bonusPrice = 0;
   let offerItems = '';
 
-  for (const current of offers.data) {
-    if (current.isChecked) {
+  const currentTypeOffers = pointsModel.offers
+    .find((offer) => offer.type === type)
+    .offers;
+
+  for (const current of currentTypeOffers) {
+    if (offers.includes(current.id)) {
       bonusPrice += current.price;
       offerItems += createOfferItemFromTemplate(current.title, current.price);
     }
@@ -67,14 +71,16 @@ const createTemplate = (point) => {
 
 export default class TripEventsItemView extends AbstractView {
   #point = null;
+  #pointsModel = null;
 
-  constructor(point = BlankPoint) {
+  constructor(point = BlankPoint, pointsModel) {
     super();
     this.#point = point;
+    this.#pointsModel = pointsModel;
   }
 
   get template() {
-    return createTemplate(this.#point);
+    return createTemplate(this.#point, this.#pointsModel);
   }
 
   setClickHandler = (callback) => {

@@ -10,16 +10,18 @@ export default class PointPresenter {
   #itemEditComponent = null;
 
   #point = null;
+  #pointsModel = null;
 
   #changeData = null;
   #changeMode = null;
 
   #mode = PointModes.DEFAULT;
 
-  constructor(boardContainer, changeData, changeMode) {
+  constructor(boardContainer, changeData, changeMode, pointsModel) {
     this.#boardContainer = boardContainer;
     this.#changeData = changeData;
     this.#changeMode = changeMode;
+    this.#pointsModel = pointsModel;
   }
 
   init = (point = BlankPoint) => {
@@ -28,8 +30,8 @@ export default class PointPresenter {
     const oldItemComponent = this.#itemComponent;
     const oldItemEditComponent = this.#itemEditComponent;
 
-    this.#itemComponent = new TripEventsItemView(this.#point);
-    this.#itemEditComponent = new TripEventsItemEditView(this.#point);
+    this.#itemComponent = new TripEventsItemView(this.#point, this.#pointsModel);
+    this.#itemEditComponent = new TripEventsItemEditView(this.#point, this.#pointsModel);
 
     this.#itemComponent.setClickHandler(this.#handlerItemClick);
     this.#itemComponent.setToggleFavoriteHandler(this.#handlerToggleFavorite);

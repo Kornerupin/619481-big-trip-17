@@ -35,15 +35,15 @@ const createInfoTemplate = (points) => {
 
   let totalPrice = 0;
 
-  for (const current of points) {
-    totalPrice += current.basePrice;
-
-    for (const offer of current.offers.data) {
-      if (offer.isChecked) {
-        totalPrice += offer.price;
-      }
-    }
-  }
+  // for (const current of points) {
+  //   totalPrice += current.basePrice;
+  //
+  //   for (const offer of current.offers.data) {
+  //     if (offer.isChecked) {
+  //       totalPrice += offer.price;
+  //     }
+  //   }
+  // }
 
   return `
     <section class="trip-main__trip-info  trip-info">

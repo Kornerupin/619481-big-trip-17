@@ -1,4 +1,4 @@
-import {render, remove} from '../framework/render';
+import {render, remove, RenderPosition} from '../framework/render';
 import TripSortView from '../view/trip-sort-view';
 import TripEventsListView from '../view/trip-events-list-view';
 import TripInfoView from '../view/trip-info-view';
@@ -9,6 +9,7 @@ import {FilterTypes, SortModes, UpdateType, UserAction} from '../const';
 import TripEventsListEmptyView from '../view/trip-events-list-empty-view';
 import TripNewPointButtonView from '../view/trip-new-point-button-view';
 import PointNewPresenter from './point-new-presenter';
+import LoadingView from '../view/loading-view';
 
 export default class BoardPresenter {
   #tripEventsContainer = null;
@@ -24,10 +25,12 @@ export default class BoardPresenter {
   #listComponent = null;
   #emptyListComponent = null;
   #sortComponent = null;
+  #loadingComponent = new LoadingView();
 
   #sortItems = sortData;
   #currentSortType = null;
   #filterType = FilterTypes.EVERYTHING;
+  #isLoading = true;
 
   #newPointButtonDisabled = false;
 
@@ -98,6 +101,11 @@ export default class BoardPresenter {
         this.#clearBoard();
         this.#renderBoard(true);
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
+        break;
     }
   };
 
@@ -108,8 +116,15 @@ export default class BoardPresenter {
     }
   };
 
+  #renderLoading = () => {
+    if (this.#loadingComponent === null) {
+      this.#loadingComponent = new LoadingView();
+    }
+    render(this.#loadingComponent, this.#tripEventsContainer, RenderPosition.AFTERBEGIN)
+  };
+
   #renderItem = (point) => {
-    const pointPresenter = new PointPresenter(this.#listComponent.element, this.#handleViewAction, this.#handleModeChange);
+    const pointPresenter = new PointPresenter(this.#listComponent.element, this.#handleViewAction, this.#handleModeChange, this.#pointsModel);
     pointPresenter.init(point);
     this.#pointPresenter.set(point.id, pointPresenter);
   };
@@ -145,10 +160,6 @@ export default class BoardPresenter {
       this.#listComponent = new TripEventsListView();
     }
     render(this.#listComponent, this.#tripEventsContainer);
-
-    for (const current of this.points) {
-      this.#renderItem(current);
-    }
   };
 
   #clearList = () => {
@@ -182,19 +193,27 @@ export default class BoardPresenter {
       this.#currentSortType = null;
     }
 
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return true;
+    }
+
     if (this.points.length > 0) {
       this.#renderSort();
       this.#renderList();
       this.#pointNewPresenter = new PointNewPresenter(this.#listComponent.element, this.#handleViewAction, this.#handleModeChange);
       this.#renderAddItem();
       this.#renderInfo();
+
+      for (const current of this.points) {
+        this.#renderItem(current);
+      }
     }
     else {
       this.#renderList();
       this.#renderAddItem();
       this.#renderEmptyList();
     }
-
   };
 
   createTask = () => {

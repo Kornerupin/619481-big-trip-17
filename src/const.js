@@ -47,6 +47,7 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 export {PointTypes, PointPrices, OfferTypes, FilterTypes, PointModes, SortModes, UserAction, UpdateType, BlankPoint};

@@ -2,19 +2,19 @@ import {getFormatDayJs, parseDayJs} from '../utils';
 import {BlankPoint, PointTypes} from '../const';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import cloneDeep from 'clone-deep';
-import {cities, getOffer} from '../mock/point';
+import {cities} from '../mock/point';
 import flatpickr from 'flatpickr';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
 const createOfferFromTemplate = (data) => {
-  const {offerId, title, price, isChecked} = data;
+  const {id, title, price, isChecked} = data;
   const checkedText = isChecked ? 'checked' : '';
 
   return `
     <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offerId}" type="checkbox" name="event-offer-${offerId}" ${checkedText}>
-      <label class="event__offer-label" for="event-offer-${offerId}">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}" type="checkbox" name="event-offer-${id}" ${checkedText}>
+      <label class="event__offer-label" for="event-offer-${id}">
         <span class="event__offer-title">${title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${price}</span>
@@ -55,7 +55,8 @@ const createEventTypeFromTemplate = (type, checkedType, isModeAdd) => {
     </div>`;
 };
 
-const createItemEditTemplate = (point, isModeAdd) => {
+const createItemEditTemplate = (point, isModeAdd, pointsModel) => {
+  console.log('render', point);
   const {basePrice, destination, type, offers} = point;
 
   let events = '';
@@ -67,7 +68,15 @@ const createItemEditTemplate = (point, isModeAdd) => {
   const dateTo = point?.dateFrom ? parseDayJs(point.dateTo) : parseDayJs(new Date());
 
   let offersNodes = '';
-  for (const current of offers.data) {
+
+  const currentTypeOffers = pointsModel.offers
+    .find((offer) => offer.type === type)
+    .offers;
+
+  for (const current of currentTypeOffers) {
+    if (offers.includes(current.id)) {
+      current.isChecked = true;
+    }
     offersNodes += createOfferFromTemplate(current);
   }
   if (!offersNodes) {
@@ -184,20 +193,23 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
   #datePickerVirtualInput = null;
   #isModeAdd = false;
 
-  constructor(point = BlankPoint) {
+  #pointsModel = null;
+
+  constructor(point = BlankPoint, pointsModel) {
     super();
     this._state = TripEventsItemEditView.parseItemToState(point);
     this.#isModeAdd = point === BlankPoint;
+    this.#pointsModel = pointsModel;
     this._restoreHandlers();
   }
 
   get template() {
-    return createItemEditTemplate(this._state, this.#isModeAdd);
+    return createItemEditTemplate(this._state, this.#isModeAdd, this.#pointsModel);
   }
 
   static parseItemToState = (item) => ({
     ...cloneDeep(item),
-    totalPrice: item.basePrice + item.offers.data.reduce((sum, currentOffer) => (sum += currentOffer.price), 0),
+    // totalPrice: item.basePrice + item.offers.data.reduce((sum, currentOffer) => (sum += currentOffer.price), 0),
   });
 
   static parseStateToTask = (state) => ({
@@ -226,23 +238,33 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
   #innerFormHandler = (evt) => {
     // const changedElement = evt.target;
     const formData = new FormData(evt.currentTarget);
+    const currentTypeOffers = this.#pointsModel.offers
+      .find((offer) => offer.type === this._state.type)
+      .offers;
 
     const eventType = formData.get('event-type');
     if (eventType !== this._state.type) {
       this.updateElement({
         type: eventType,
-        offers: getOffer(eventType),
+        offers: [],
       });
+      console.log(this._state);
     }
 
-    for(const eventOffer of this._state.offers.data) {
-      const eventOfferData = !!formData.get(`event-offer-${eventOffer.offerId}`);
-      if (eventOfferData !== eventOffer.isChecked) {
-        const updateOffers = cloneDeep(this._state.offers);
-        const updateItem = updateOffers.data.find((current) => current.offerId === eventOffer.offerId);
-        updateItem.isChecked = eventOfferData;
+    for (const currentOffer of currentTypeOffers) {
+      const isCurrentOfferChecked = !!formData.get(`event-offer-${currentOffer.id}`);
+      // Если галочка поставлена, а в массиве "активных" пунктов этого пункта нет
+      if (isCurrentOfferChecked && !this._state.offers.includes(currentOffer.id)) {
+        const newOffers = [...this._state.offers, currentOffer.id];
         this.updateElement({
-          offers: updateOffers,
+          offers: newOffers,
+        });
+      }
+      // Если галочки нет, а в массиве пункт указан как "активный"
+      if (!isCurrentOfferChecked && this._state.offers.includes(currentOffer.id)) {
+        const newOffers = this._state.offers.filter((currentId) => currentId !== currentOffer.id);
+        this.updateElement({
+          offers: newOffers,
         });
       }
     }
