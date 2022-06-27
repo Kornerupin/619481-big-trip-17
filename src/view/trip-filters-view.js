@@ -4,7 +4,7 @@ import {FILTER_TYPES} from '../const';
 const createFilterTemplate = (type, activeType, pointsModel, filterModel) => {
   const textChecked = type.toLowerCase() === activeType.toLowerCase() ? 'checked' : '';
   let textDisabled = filterModel.filters[FILTER_TYPES[type]].filterFunc(pointsModel.points).length > 0 ? '' : ' disabled ';
-  if (type === FILTER_TYPES.EVERYTHING) {
+  if (FILTER_TYPES[type] === FILTER_TYPES.EVERYTHING) {
     textDisabled = '';
   }
 
