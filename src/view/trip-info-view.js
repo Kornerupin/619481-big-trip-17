@@ -1,7 +1,7 @@
 import AbstractView from '../framework/view/abstract-view';
 import {getFormatDayJs, parseDayJs} from '../utils';
 
-const createInfoTemplate = (points, pointsModel) => {
+const createInfoTemplate = (points) => {
   let temp = '';
   let cities =
     points
@@ -36,17 +36,7 @@ const createInfoTemplate = (points, pointsModel) => {
   let totalPrice = 0;
 
   for (const point of points) {
-    totalPrice += point.basePrice;
-
-    const currentTypeOffers = pointsModel.offers
-      .find((offer) => offer.type === point.type)
-      .offers;
-
-    for (const offer of currentTypeOffers) {
-      if (point.offers.includes(point.id)) {
-        totalPrice += offer.price;
-      }
-    }
+    totalPrice += point.basePrice + point.totalPrice;
   }
 
   return `

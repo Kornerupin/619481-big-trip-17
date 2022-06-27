@@ -1,7 +1,7 @@
 import {getFormatDayJs, getFormatTime} from '../utils';
 import dayjs from 'dayjs';
 import AbstractView from '../framework/view/abstract-view';
-import {BlankPoint} from '../const';
+import {BLANK_POINT} from '../const';
 
 const createOfferItemFromTemplate = (title, price) => `
     <li class="event__offer">
@@ -73,7 +73,7 @@ export default class TripEventsItemView extends AbstractView {
   #point = null;
   #pointsModel = null;
 
-  constructor(point = BlankPoint, pointsModel) {
+  constructor(point = BLANK_POINT, pointsModel) {
     super();
     this.#point = point;
     this.#pointsModel = pointsModel;

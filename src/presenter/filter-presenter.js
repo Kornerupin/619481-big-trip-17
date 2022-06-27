@@ -1,5 +1,5 @@
 import {render, remove, replace} from '../framework/render';
-import {UpdateType} from '../const';
+import {UPDATE_TYPE} from '../const';
 import TripFiltersView from '../view/trip-filters-view';
 
 export default class FilterPresenter {
@@ -21,7 +21,7 @@ export default class FilterPresenter {
   init = () => {
     const prevFilterComponent = this.#filterComponent;
 
-    this.#filterComponent = new TripFiltersView(this.#filterModel.filter);
+    this.#filterComponent = new TripFiltersView(this.#filterModel.filter, this.#pointsModel, this.#filterModel);
     this.#filterComponent.setChangeHandler(this.#handleFilterChange);
 
     if (prevFilterComponent === null) {
@@ -42,6 +42,6 @@ export default class FilterPresenter {
       return;
     }
 
-    this.#filterModel.setFilter(UpdateType.MAJOR, filterMode);
+    this.#filterModel.setFilter(UPDATE_TYPE.MAJOR, filterMode);
   };
 }

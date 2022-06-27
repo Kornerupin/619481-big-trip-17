@@ -1,9 +1,9 @@
 import Observable from '../framework/observable';
-import {FilterTypes} from '../const';
+import {FILTER_TYPES} from '../const';
 import {isPointExpired} from '../utils';
 
 export default class FiltersModel extends Observable {
-  #currentFilter = FilterTypes.EVERYTHING;
+  #currentFilter = FILTER_TYPES.EVERYTHING;
 
   get filter() {
     return this.#currentFilter;
@@ -11,17 +11,17 @@ export default class FiltersModel extends Observable {
 
   get filters() {
     return {
-      [FilterTypes.EVERYTHING]:
+      [FILTER_TYPES.EVERYTHING]:
         {
           filterFunc: (points) => points,
           emptyText: 'Click New Event to create your first point',
         },
-      [FilterTypes.FUTURE]:
+      [FILTER_TYPES.FUTURE]:
         {
           filterFunc: (points) => points.filter((current) => !isPointExpired(current)),
           emptyText: 'There are no future events now',
         },
-      [FilterTypes.PAST]:
+      [FILTER_TYPES.PAST]:
         {
           filterFunc: (points) => points.filter((current) => isPointExpired(current)),
           emptyText: 'There are no past events now',

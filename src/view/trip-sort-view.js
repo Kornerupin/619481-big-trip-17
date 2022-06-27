@@ -16,11 +16,13 @@ const createSortItemTemplate = (item) => {
   `;
 };
 
-const createSortTemplate = (sortItems) => {
+const createSortTemplate = (sortItems, currentSort) => {
   // Проверяем, что хоть один фильтр задан как активный
-  const checkChecked = sortItems.find((current) => current.isChecked);
-  if (!checkChecked) {
+  const checkedIndex = sortItems.findIndex((current) => current.name === currentSort);
+  if (checkedIndex === -1) {
     sortItems[0].isChecked = true;
+  } else {
+    sortItems[checkedIndex].isChecked = true;
   }
 
   const items = sortItems.map((current) => createSortItemTemplate(current)).join('');
@@ -33,15 +35,17 @@ const createSortTemplate = (sortItems) => {
 };
 
 export default class TripSortView extends AbstractView {
-  #filtersData = null;
+  #sortsData = null;
+  #currentSort = null;
 
-  constructor(filtersData) {
+  constructor(sortsData, currentSort) {
     super();
-    this.#filtersData = filtersData;
+    this.#sortsData = sortsData;
+    this.#currentSort = currentSort;
   }
 
   get template() {
-    return createSortTemplate(this.#filtersData);
+    return createSortTemplate(this.#sortsData, this.#currentSort);
   }
 
   setSortModeChangeHandler = (callback) => {
