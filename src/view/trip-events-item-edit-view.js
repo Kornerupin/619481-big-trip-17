@@ -93,7 +93,7 @@ const createItemEditTemplate = (point, isModeAdd, pointsModel) => {
   const destinationDescription = destination.description;
   const destinationPictures = destination.pictures.map(
     (current) => createPictureFromTemplate(current)
-  ).join();
+  ).join('');
   const destinationList = pointsModel.destinations
     .map((current) => `<option value="${current.name}">${current.name}</option>`)
     .join('');
