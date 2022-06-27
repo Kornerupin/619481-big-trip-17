@@ -94,12 +94,16 @@ export default class PointNewPresenter {
   };
 
   #handlerItemSubmit = (newData) => {
+    const pointsCount = this.#pointsModel.points.length;
     this.#changeData(
       UPDATE_TYPE.MINOR,
       USER_ACTION.CREATE_POINT,
       {...this.#point, ...newData}
     );
-    this.#closeMode();
+    const pointsCountNew = this.#pointsModel.points.length;
+    if (pointsCount !== pointsCountNew) {
+      this.#closeMode();
+    }
   };
 
   #handlerItemEditClose = () => {

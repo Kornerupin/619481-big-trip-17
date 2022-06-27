@@ -1,4 +1,4 @@
-import {render, remove, replace} from '../framework/render';
+import {render, remove, replace, RenderPosition} from '../framework/render';
 import {UPDATE_TYPE} from '../const';
 import TripFiltersView from '../view/trip-filters-view';
 
@@ -25,7 +25,7 @@ export default class FilterPresenter {
     this.#filterComponent.setChangeHandler(this.#handleFilterChange);
 
     if (prevFilterComponent === null) {
-      render(this.#filterComponent, this.#filterContainer);
+      render(this.#filterComponent, this.#filterContainer, RenderPosition.AFTEREND);
       return true;
     }
 

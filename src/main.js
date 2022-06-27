@@ -14,9 +14,9 @@ const siteTripContainer = siteMainElement.querySelector('.trip-events');
 
 const pointsModel = new PointsModel(new PointsApiService(END_POINT, AUTHORIZATION));
 const filtersModel = new FiltersModel();
-const boardPresenter = new BoardPresenter(siteTripContainer, siteTripMainContainer, pointsModel, filtersModel);
 const filterPresenter = new FilterPresenter(siteFiltersContainer, filtersModel, pointsModel);
+const boardPresenter = new BoardPresenter(siteTripContainer, siteTripMainContainer, pointsModel, filtersModel);
 
-filterPresenter.init();
-boardPresenter.init();
 pointsModel.init();
+boardPresenter.init();
+filterPresenter.init();
