@@ -93,7 +93,7 @@ const createItemEditTemplate = (point, isModeAdd, pointsModel) => {
   const destinationDescription = destination.description;
   const destinationPictures = destination.pictures.map(
     (current) => createPictureFromTemplate(current)
-  ).join();
+  ).join('');
   const destinationList = pointsModel.destinations
     .map((current) => `<option value="${current.name}">${current.name}</option>`)
     .join('');
@@ -262,6 +262,7 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
     const currentTypeOffers = this.#pointsModel.offers
       .find((offer) => offer.type === this._state.type)
       .offers;
+
 
     const eventType = formData.get('event-type');
     if (eventType !== this._state.type) {

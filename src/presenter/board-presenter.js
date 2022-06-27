@@ -184,7 +184,7 @@ export default class BoardPresenter {
     if (this.#infoComponent === null) {
       this.#infoComponent = new TripInfoView(this.points, this.#pointsModel);
     }
-    render(this.#infoComponent, this.#tripMainContainer);
+    render(this.#infoComponent, this.#tripMainContainer, RenderPosition.AFTERBEGIN);
   };
 
   #clearInfo = () => {
@@ -260,10 +260,10 @@ export default class BoardPresenter {
     }
 
     if (this.points.length > 0) {
-      this.#renderSort();
-      this.#renderListContainer();
       this.#renderAddItem();
       this.#renderInfo();
+      this.#renderSort();
+      this.#renderListContainer();
       this.#renderListItems();
       this.#handlerSortChange(this.#currentSortType);
     }
