@@ -93,16 +93,16 @@ export default class PointNewPresenter {
     }
   };
 
-  #handlerItemSubmit = (newData) => {
-    const pointsCount = this.#pointsModel.points.length;
-    this.#changeData(
+  #handlerItemSubmit = async (newData) => {
+    const beforePoints = this.#pointsModel.points.length;
+    await this.#changeData(
       UPDATE_TYPE.MINOR,
       USER_ACTION.CREATE_POINT,
       {...this.#point, ...newData}
     );
-    const pointsCountNew = this.#pointsModel.points.length;
-    if (pointsCount !== pointsCountNew) {
-      this.#closeMode();
+    const afterPoints = this.#pointsModel.points.length;
+    if (beforePoints < afterPoints) {
+      this.resetView();
     }
   };
 

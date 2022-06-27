@@ -105,7 +105,6 @@ export default class BoardPresenter {
         } catch(err) {
           this.#pointNewPresenter.setAborting();
         }
-        break;
     }
 
     this.#uiBlocker.unblock();
@@ -298,12 +297,6 @@ export default class BoardPresenter {
       remove(this.#newPointButtonComponent);
       this.#newPointButtonComponent.removeElement();
       this.#newPointButtonComponent = null;
-    }
-  };
-
-  #clearPointNewPresenter = () => {
-    if (this.#pointNewPresenter) {
-      this.#pointNewPresenter = null;
     }
   };
 
