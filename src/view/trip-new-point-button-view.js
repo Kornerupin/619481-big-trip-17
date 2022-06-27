@@ -11,7 +11,7 @@ const createInfoTemplate = (isDisabled) => {
 };
 
 export default class TripNewPointButtonView extends AbstractView {
-  #isDisabled = null;
+  #isDisabled = false;
 
   constructor(isDisabled) {
     super();

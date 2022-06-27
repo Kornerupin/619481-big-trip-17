@@ -4,7 +4,7 @@ import FilterPresenter from './presenter/filter-presenter';
 import FiltersModel from './model/filters-model';
 import PointsApiService from './points-api-service';
 
-const AUTHORIZATION = 'Basic 2342ji3oj1l23ji';
+const AUTHORIZATION = 'Basic 2342ji3oj1l23j3i';
 const END_POINT = 'https://17.ecmascript.pages.academy/big-trip';
 
 const siteMainElement = document.querySelector('.page-body');

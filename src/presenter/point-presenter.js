@@ -1,7 +1,7 @@
 import TripEventsItemView from '../view/trip-events-item-view';
 import TripEventsItemEditView from '../view/trip-events-item-edit-view';
 import {render, replace, remove} from '../framework/render';
-import {BlankPoint, PointModes, UpdateType, UserAction} from '../const';
+import {BLANK_POINT, POINT_MODES, UPDATE_TYPE, USER_ACTION} from '../const';
 
 export default class PointPresenter {
   #boardContainer = null;
@@ -15,7 +15,7 @@ export default class PointPresenter {
   #changeData = null;
   #changeMode = null;
 
-  #mode = PointModes.DEFAULT;
+  #mode = POINT_MODES.DEFAULT;
 
   constructor(boardContainer, changeData, changeMode, pointsModel) {
     this.#boardContainer = boardContainer;
@@ -24,7 +24,7 @@ export default class PointPresenter {
     this.#pointsModel = pointsModel;
   }
 
-  init = (point = BlankPoint) => {
+  init = (point = BLANK_POINT) => {
     this.#point = point;
 
     const oldItemComponent = this.#itemComponent;
@@ -46,13 +46,12 @@ export default class PointPresenter {
 
     // При повторном обращении - перерисовываем компоненты.
     // За счёт проверки наличия в DOM, всегда заменяется только один компонент (существующий в списке)
-    if (this.#mode === PointModes.DEFAULT) {
+    if (this.#mode === POINT_MODES.DEFAULT) {
       replace(this.#itemComponent, oldItemComponent);
     }
 
-    if (this.#mode === PointModes.EDIT) {
-      replace(this.#itemComponent, oldItemEditComponent);
-      this.#mode = PointModes.DEFAULT;
+    if (this.#mode === POINT_MODES.EDIT) {
+      replace(this.#itemEditComponent, oldItemEditComponent);
     }
 
     remove(oldItemComponent);
@@ -60,7 +59,7 @@ export default class PointPresenter {
   };
 
   setSaving = () => {
-    if (this.#mode === PointModes.EDIT) {
+    if (this.#mode === POINT_MODES.EDIT) {
       this.#itemEditComponent.updateElement({
         isDisabled: true,
         isSaving: true,
@@ -69,7 +68,7 @@ export default class PointPresenter {
   };
 
   setDeleting = () => {
-    if (this.#mode === PointModes.EDIT) {
+    if (this.#mode === POINT_MODES.EDIT) {
       this.#itemEditComponent.updateElement({
         isDisabled: true,
         isDeleting: true,
@@ -78,7 +77,7 @@ export default class PointPresenter {
   };
 
   setAborting = () => {
-    if (this.#mode === PointModes.DEFAULT) {
+    if (this.#mode === POINT_MODES.DEFAULT) {
       this.#itemComponent.shake();
       return;
     }
@@ -95,7 +94,7 @@ export default class PointPresenter {
   };
 
   resetView = () => {
-    if (this.#mode === PointModes.EDIT) {
+    if (this.#mode === POINT_MODES.EDIT) {
       this.#itemEditComponent.reset(this.#point);
       this.#replaceEditToItem();
     }
@@ -104,7 +103,7 @@ export default class PointPresenter {
   #replaceEditToItem = () => {
     replace(this.#itemComponent, this.#itemEditComponent);
     document.removeEventListener('keydown', this.#onEscKeyDown);
-    this.#mode = PointModes.DEFAULT;
+    this.#mode = POINT_MODES.DEFAULT;
   };
 
   #onEscKeyDown = (evt) => {
@@ -118,7 +117,7 @@ export default class PointPresenter {
     this.#changeMode();
     replace(this.#itemEditComponent, this.#itemComponent);
     document.addEventListener('keydown', this.#onEscKeyDown);
-    // this.#mode = PointModes.EDIT;
+    this.#mode = POINT_MODES.EDIT;
   };
 
   #handlerItemClick = () => {
@@ -127,17 +126,16 @@ export default class PointPresenter {
 
   #handlerItemSubmit = (newData) => {
     this.#changeData(
-      UpdateType.MINOR,
-      UserAction.UPDATE_POINT,
+      UPDATE_TYPE.MINOR,
+      USER_ACTION.UPDATE_POINT,
       {...this.#point, ...newData}
     );
-    // this.#replaceEditToItem();
   };
 
   #handlerItemDelete = () => {
     this.#changeData(
-      UpdateType.MINOR,
-      UserAction.DELETE_POINT,
+      UPDATE_TYPE.MINOR,
+      USER_ACTION.DELETE_POINT,
       {...this.#point}
     );
   };
@@ -148,8 +146,8 @@ export default class PointPresenter {
 
   #handlerToggleFavorite = () => {
     this.#changeData(
-      UpdateType.PATCH,
-      UserAction.UPDATE_POINT,
+      UPDATE_TYPE.PATCH,
+      USER_ACTION.UPDATE_POINT,
       {...this.#point, isFavorite: !this.#point.isFavorite}
     );
   };

@@ -1,7 +1,7 @@
-import daysjs from 'dayjs';
-import {OfferTypes, SortModes} from './const';
+import dayjs from 'dayjs';
+import {OFFER_TYPES, SORT_MODES} from './const';
 
-const getFormatDayJs = (date, format = 'YYYY-MM-DDTHH:mm:ss.SSS[Z]') => daysjs.isDayjs(date) ? date.format(format) : false;
+const getFormatDayJs = (date, format = 'YYYY-MM-DDTHH:mm:ss.SSS[Z]') => dayjs.isDayjs(date) ? date.format(format) : false;
 
 const getFormatTime = (time) => {
   const seconds = Math.floor(time / 1000);
@@ -30,9 +30,9 @@ const getFormatTime = (time) => {
 
 const getRandomFromArray = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-const parseDayJs = (date) => daysjs.isDayjs(date) ? date : daysjs(date);
+const parseDayJs = (date) => dayjs.isDayjs(date) ? date : dayjs(date);
 
-const isPointExpired = (point) => point && daysjs().isAfter(daysjs(point));
+const isPointExpired = (point) => point && dayjs().isAfter(dayjs(point));
 
 const getAllArrayId = (baseArr, searchArr) => searchArr
   .map((current) => baseArr.indexOf(current))
@@ -40,26 +40,21 @@ const getAllArrayId = (baseArr, searchArr) => searchArr
   .sort();
 
 const sorts = {
-  [SortModes.DAY]: (items) => items.sort((a, b) => (parseDayJs(a.dateFrom).diff(parseDayJs(b.dateFrom)))),
-  [SortModes.TIME]: (items) => items.sort((a, b) => {
+  [SORT_MODES.DAY]: (items) => items.sort((a, b) => (parseDayJs(a.dateFrom).diff(parseDayJs(b.dateFrom)))),
+  [SORT_MODES.TIME]: (items) => items.sort((a, b) => {
     const aTime = Math.abs(parseDayJs(b.dateFrom).diff(parseDayJs(b.dateTo)));
     const bTime = Math.abs(parseDayJs(a.dateFrom).diff(a.dateTo));
 
     return (aTime - bTime);
   }),
-  [SortModes.OFFERS]: (items) => items.sort((a, b) => {
+  [SORT_MODES.OFFERS]: (items) => items.sort((a, b) => {
     const aOffersCount = a.offers.data.reduce((count, currentOffer) => (count += currentOffer.isChecked ? 1 : 0), 0);
     const bOffersCount = (b.offers.data.reduce((count, currentOffer) => (count += currentOffer.isChecked ? 1 : 0), 0));
 
     return -(aOffersCount - bOffersCount);
   }),
-  [SortModes.PRICE]: (items) => items.sort((a, b) => {
-    const aTotalPrice = a.basePrice + a.offers.data.reduce((sum, currentOffer) => (sum += currentOffer.isChecked ? currentOffer.price : 0), 0);
-    const bTotalPrice = b.basePrice + b.offers.data.reduce((sum, currentOffer) => (sum += currentOffer.isChecked ? currentOffer.price : 0), 0);
-
-    return (bTotalPrice - aTotalPrice);
-  }),
-  [SortModes.EVENT]: (items) => items.sort((a, b) => (OfferTypes.indexOf(a.type) - OfferTypes.indexOf(b.type))),
+  [SORT_MODES.PRICE]: (items) => items.sort((a, b) => b.totalPrice - a.totalPrice),
+  [SORT_MODES.EVENT]: (items) => items.sort((a, b) => (OFFER_TYPES.indexOf(a.type) - OFFER_TYPES.indexOf(b.type))),
 };
 
 export {

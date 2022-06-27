@@ -1,5 +1,5 @@
 import Observable from '../framework/observable';
-import {UpdateType} from '../const';
+import {UPDATE_TYPE} from '../const';
 
 export default class PointsModel extends Observable{
   #points = [];
@@ -25,8 +25,10 @@ export default class PointsModel extends Observable{
   }
 
   #adaptToClient = (point) => {
+    const ALL_POINT_OFFERS = this.offers.find((current) => current.type === point.type).offers;
     const adaptedPont = {
       ...point,
+      totalPrice: point['base_price'] + point.offers.reduce((sum, currentOfferID) => (sum += ALL_POINT_OFFERS.find((current) => current.id === currentOfferID).price), 0),
       basePrice: point['base_price'],
       dateFrom: point['date_from'],
       dateTo: point['date_to'],
@@ -59,7 +61,7 @@ export default class PointsModel extends Observable{
       this.#points = [];
     }
 
-    this._notify(UpdateType.INIT);
+    this._notify(UPDATE_TYPE.INIT, false);
   };
 
   updatePoint = async (updateType, updatePoint) => {
@@ -69,7 +71,6 @@ export default class PointsModel extends Observable{
       throw new Error('Can\'t update unexisting point!');
     }
 
-    this._notify(updateType, updatePoint);
     try {
       const response = await this.#pointsApiService.updatePoint(updatePoint);
       const updatedPoint = this.#adaptToClient(response);
@@ -102,17 +103,7 @@ export default class PointsModel extends Observable{
       throw new Error('Can\'t delete unexisting point!');
     }
 
-    this.#points = [
-      ...this.#points.slice(0, index),
-      ...this.#points.slice(index + 1)
-    ];
-
-    this._notify(updateType, deletePoint);
-
     try {
-      // Обратите внимание, метод удаления задачи на сервере
-      // ничего не возвращает. Это и верно,
-      // ведь что можно вернуть при удалении задачи?
       await this.#pointsApiService.deletePoint(deletePoint);
       this.#points = [
         ...this.#points.slice(0, index),

@@ -1,5 +1,5 @@
 import {getFormatDayJs, parseDayJs} from '../utils';
-import {BlankPoint, PointTypes} from '../const';
+import {BLANK_POINT, POINT_TYPES} from '../const';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import cloneDeep from 'clone-deep';
 import flatpickr from 'flatpickr';
@@ -30,18 +30,17 @@ const createPictureFromTemplate = (data) => {
 };
 
 const createEventTypeFromTemplate = (type, checkedType, isModeAdd, isDisabled) => {
-  if (PointTypes.indexOf(type) === -1) {
+  if (POINT_TYPES.indexOf(type) === -1) {
     return false;
   }
 
   const textChecked = type === checkedType ? ' checked' : '';
-  const textAdd = isModeAdd ? 1 : 0;
   const textDisabled = isDisabled ? ' disabled ' : '';
 
   return `
     <div class="event__type-item">
       <input
-        id="event-type-${type}-${textAdd}"
+        id="event-type-${type}-${+isModeAdd}"
         class="event__type-input  visually-hidden"
         type="radio"
         name="event-type"
@@ -51,7 +50,7 @@ const createEventTypeFromTemplate = (type, checkedType, isModeAdd, isDisabled) =
       >
       <label
         class="event__type-label  event__type-label--${type}"
-        for="event-type-${type}-${textAdd}">
+        for="event-type-${type}-${+isModeAdd}">
           ${type}
       </label>
     </div>`;
@@ -69,7 +68,7 @@ const createItemEditTemplate = (point, isModeAdd, pointsModel) => {
   } = point;
 
   let events = '';
-  for (const current of PointTypes) {
+  for (const current of POINT_TYPES) {
     events+= createEventTypeFromTemplate(current, type, isModeAdd, isDisabled);
   }
 
@@ -95,6 +94,9 @@ const createItemEditTemplate = (point, isModeAdd, pointsModel) => {
   const destinationPictures = destination.pictures.map(
     (current) => createPictureFromTemplate(current)
   ).join();
+  const destinationList = pointsModel.destinations
+    .map((current) => `<option value="${current.name}">${current.name}</option>`)
+    .join('');
 
   let destinationBlock = '';
   if (destinationDescription.length > 1 || destinationPictures.length > 1) {
@@ -149,9 +151,7 @@ const createItemEditTemplate = (point, isModeAdd, pointsModel) => {
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${cityName}" list="destination-list-1" ${disabledText}>
             <datalist id="destination-list-1">
-              <option value="Amsterdam"></option>
-              <option value="Geneva"></option>
-              <option value="Chamonix"></option>
+              ${destinationList}
             </datalist>
           </div>
 
@@ -205,10 +205,10 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
 
   #pointsModel = null;
 
-  constructor(point = BlankPoint, pointsModel) {
+  constructor(point = BLANK_POINT, pointsModel) {
     super();
     this._state = TripEventsItemEditView.parseItemToState(point);
-    this.#isModeAdd = point === BlankPoint;
+    this.#isModeAdd = point === BLANK_POINT;
     this.#pointsModel = pointsModel;
     this._restoreHandlers();
   }
@@ -219,7 +219,6 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
 
   static parseItemToState = (item) => ({
     ...cloneDeep(item),
-    // totalPrice: item.basePrice + item.offers.data.reduce((sum, currentOffer) => (sum += currentOffer.price), 0),
     isDisabled: false,
     isSaving: false,
     isDeleting: false,
@@ -241,7 +240,8 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setClickHandler(this._callback.click);
-    this.setCloseHandler(this._callback.close);
+    this.setCanselHandler(this._callback.close);
+    this.setDeleteHandler(this._callback.delete);
     this.#setDatepicker();
     this.#setDateByState();
   };
@@ -258,7 +258,6 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
   };
 
   #innerFormHandler = (evt) => {
-    // const changedElement = evt.target;
     const formData = new FormData(evt.currentTarget);
     const currentTypeOffers = this.#pointsModel.offers
       .find((offer) => offer.type === this._state.type)
@@ -426,6 +425,9 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
   };
 
   setDeleteHandler = (callback) => {
+    if (this.#isModeAdd) {
+      return false;
+    }
     this._callback.delete = callback;
 
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteHandler);
@@ -437,7 +439,10 @@ export default class TripEventsItemEditView extends AbstractStatefulView {
     this._callback.delete();
   };
 
-  setCloseHandler = (callback) => {
+  setCanselHandler = (callback) => {
+    if (!this.#isModeAdd) {
+      return false;
+    }
     this._callback.close = callback;
 
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#closeHandler);
